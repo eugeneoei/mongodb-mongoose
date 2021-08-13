@@ -171,13 +171,13 @@ app.put('/tweets/:id', async (req, res) => {
 			)
 		)
 
+		// PUT vs PATCH
+		// https://stackoverflow.com/questions/28459418/use-of-put-vs-patch-methods-in-rest-api-real-life-scenarios
+
 	} catch (e) {
 		res.status(400).send(e.message ?? e)
 	}
 })
-
-// PUT vs PATCH
-// https://stackoverflow.com/questions/28459418/use-of-put-vs-patch-methods-in-rest-api-real-life-scenarios
 
 app.delete('/tweets/:id', async (req, res) => {
 	try {
@@ -200,7 +200,7 @@ app.delete('/tweets/:id', async (req, res) => {
 
 		// // METHOD 2
 		// // https://mongoosejs.com/docs/api.html#model_Model.findOneAndDelete
-		// // Finds a matching document, removes it.
+		// // Finds a matching document, removes it else. Returns null if no match is found
 		// const deleteResponse = await Tweet.findOneAndDelete({
 		// 	_id: req.params.id
 		// })
@@ -213,6 +213,7 @@ app.delete('/tweets/:id', async (req, res) => {
 		// // METHOD 3
 		// // https://mongoosejs.com/docs/api.html#model_Model.findByIdAndDelete
 		// // "findByIdAndDelete(id)" is a shorthand for "findOneAndDelete({ _id: id })"
+		// // Returns null if no match is found
 		// const deleteResponse = await Tweet.findByIdAndDelete(req.params.id)
 		// if (deleteResponse) {
 		// 	res.send('Successfully deleted tweet using "findByIdAndDelete" method.')
@@ -222,7 +223,7 @@ app.delete('/tweets/:id', async (req, res) => {
 
 		// // METHOD 4
 		// // https://mongoosejs.com/docs/api.html#model_Model.findOneAndRemove
-		// // Finds a matching document, removes it.
+		// // Finds a matching document, removes it else. Returns null if no match is found
 		// const deleteResponse = await Tweet.findOneAndRemove({
 		// 	_id: req.params.id
 		// })
@@ -235,6 +236,7 @@ app.delete('/tweets/:id', async (req, res) => {
 		// // METHOD 5
 		// // https://mongoosejs.com/docs/api.html#model_Model.findByIdAndRemove
 		// // "findByIdAndRemove(id)" is equivalent to "findOneAndRemove({ _id: id })"
+		// // Returns null if no match is found
 		// const deleteResponse = await Tweet.findByIdAndRemove(req.params.id)
 		// if (deleteResponse) {
 		// 	res.send('Successfully deleted tweet using "findByIdAndRemove" method.')
@@ -242,15 +244,12 @@ app.delete('/tweets/:id', async (req, res) => {
 		// 	throw 'The tweet you are trying to delete using "findByIdAndRemove" method does not exist.'
 		// }
 
-
-		// Comments
-
+		// //////// Comments ////////
 		// findOneAndDelete vs findOneAndRemove? which should you use?
 		// according to the documentation,
-		// Model.findOneAndDelete() differs slightly from Model.findOneAndRemove() in that findOneAndRemove() becomes a MongoDB findAndModify() command, as opposed to a findOneAndDelete() command.
-		// For most mongoose use cases, this distinction is purely pedantic.
-		// You should use findOneAndDelete() unless you have a good reason not to.
-
+		// 	Model.findOneAndDelete() differs slightly from Model.findOneAndRemove() in that findOneAndRemove() becomes a MongoDB findAndModify() command, as opposed to a findOneAndDelete() command.
+		// 	For most mongoose use cases, this distinction is purely pedantic.
+		// 	You should use findOneAndDelete() unless you have a good reason not to.
 		// i would think the same applies for findByIdAndDelete vs findByIdAndRemove
 
 	} catch (e) {
