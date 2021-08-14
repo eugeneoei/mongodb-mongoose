@@ -1,14 +1,14 @@
 const tweetsSeed = require('../seed/tweets')
 
-const clearDatabase = () => {
-
+const clearAndSeedDatabase = async collection => {
+	await collection.collection.drop()
+	await collection.collection.insertMany(tweetsSeed)
 }
 
-const seedDatabse = () => {
+// const seedDatabse = () => {
 
-}
+// }
 
 module.exports = {
-	clearDatabase,
-	seedDatabse
+	clearAndSeedDatabase
 }

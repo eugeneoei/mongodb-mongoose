@@ -15,9 +15,17 @@ const tweetSchema = new Schema(
 			type: String,
 			required: true
 		},
-		likes: {
-			type: Number,
-			default : 0
+		reactions: {
+			likes: {
+				type: Number,
+				// min: 0,
+				default : 0
+			},
+			dislikes: {
+				type: Number,
+				// min: 0,
+				default : 0	
+			}
 		}
 	},
 	{
@@ -25,6 +33,6 @@ const tweetSchema = new Schema(
 	}
 )
 
-const Tweet = mongoose.model('Tweet', tweetSchema)
+const Tweet = mongoose.model('Tweet', tweetSchema) // tweetSchema to be used on Tweet collection
 
 module.exports = Tweet

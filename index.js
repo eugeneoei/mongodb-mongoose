@@ -2,10 +2,11 @@ const express = require('express')
 const app = express()
 const mongoose = require('mongoose')
 const Tweet = require('./schemas/tweet')
-const mongoURI = 'mongodb://localhost:27017/tweets'
+const validateReactions = require('./middlewares/validateReactions')
+const utils = require('./utils/utils')
 
+const mongoURI = 'mongodb://localhost:27017/tweets' // tweets is db name
 const dbConnection = mongoose.connection
-
 mongoose.connect(
 	mongoURI,
 	{
@@ -13,22 +14,28 @@ mongoose.connect(
 		useUnifiedTopology: true
 	}
 )
-
 dbConnection.on('error', err => console.log(err.message))
 dbConnection.on('connected', err => console.log('Connection to mongoDB successfully!'))
 dbConnection.on('disconnected', err => console.log('Broken connection to mongoDB'))
+mongoose.set('useFindAndModify', false)
 
 app.use(express.json())
-mongoose.set('useFindAndModify', false)
 // mongoose.set('returnOriginal', false) // global settings such that all updated documents returned are AFTER the update
+
+app.get('/tweets/clear-and-seed', async (req, res) => {
+	try {
+		await utils.clearAndSeedDatabase(Tweet)
+		res.send('ok')
+	} catch (e) {
+		res.status(400).send(e.message)
+	}
+})
 
 app.get('/tweets', async (req, res) => {
 	try {
-		res.send(
-			await Tweet.find({})
-		)
+		res.send(await Tweet.find({}))
 	} catch (e) {
-		res.status(400).send(e.message ?? e)
+		res.status(400).send(e.message)
 	}
 })
 
@@ -56,7 +63,7 @@ app.get('/tweets/:id', async (req, res) => {
 		// 	res.status(404).send('Tweet not found')
 		// }
 	} catch (e) {
-		res.status(400).send(e.message ?? e)
+		res.status(400).send(e.message)
 	}
 })
 
@@ -64,7 +71,45 @@ app.post('/tweets', async (req, res) => {
 	try {
 		res.send(await Tweet.create(req.body))
 	} catch (e) {
-		res.status(400).send(e.message ?? e)
+		res.status(400).send(e.message)
+	}
+})
+
+app.patch('/tweets/:id/reactions', validateReactions, async (req, res) => {
+	try {
+		const type = req.body.type
+		const action = req.body.action
+		const tweet = await Tweet.findById(req.params.id)
+		const typeCurrentCount = tweet.reactions[type]
+		if (action === 'decrement' && typeCurrentCount < 1) {
+			res.send(tweet)
+		} else {
+			const path = `reactions.${type}`
+			const incrementValue = action === 'increment' ? 1 : -1
+			const updatedTweet = await Tweet.findByIdAndUpdate(
+				req.params.id,
+				{
+					// $inc means increment
+					$inc: {
+						// updating a nested document
+						[path]: incrementValue
+					}
+				},
+				{
+					new: true
+				}
+			)
+			if (updatedTweet) {
+				res.send(updatedTweet)
+			} else {
+				throw new ReferenceError('Tweet you are trying to update does not exist')
+			}
+		}
+	} catch (e) {
+		res.status(400).send({
+			name: e.name,
+			message: e.message
+		})
 	}
 })
 
@@ -74,21 +119,24 @@ app.patch('/tweets/:id', async (req, res) => {
 	try {
 		// METHOD 1
 		// https://mongoosejs.com/docs/api.html#model_Model.findOneAndUpdate
-		res.send(
-			await Tweet.findOneAndUpdate(
-				{ _id: req.params.id },
-				{
-					title: `${req.body.title} using "findOneAndUpdate" method using HTTP PATCH`
-				},
-				{
-					// By default, "findOneAndUpdate" returns the document as it was BEFORE the update was applied.
-					// If you set the options "new" to true, "findOneAndUpdate" will instead return document AFTER update was applied.
-					// if you want all updated documents returned are AFTER the update, you can set it globally using "mongoose.set('returnOriginal', false)" at the top
-					// note that there are other flags to set as well
-					new: true
-				}
-			)
+		const updatedTweet = await Tweet.findOneAndUpdate(
+			{ _id: req.params.id },
+			{
+				title: `${req.body.title} using "findOneAndUpdate" method using HTTP PATCH`
+			},
+			{
+				// By default, "findOneAndUpdate" returns the document as it was BEFORE the update was applied.
+				// If you set the options "new" to true, "findOneAndUpdate" will instead return document AFTER update was applied.
+				// if you want all updated documents returned are AFTER the update, you can set it globally using "mongoose.set('returnOriginal', false)" at the top
+				// note that there are other flags to set as well
+				new: true
+			}
 		)
+		if (updatedTweet) {
+			res.send(updatedTweet)
+		} else {
+			throw new Error('Tweet you are trying to update does not exist.')
+		}
 
 		// // METHOD 2
 		// // https://mongoosejs.com/docs/api.html#model_Model.findByIdAndUpdate
@@ -131,51 +179,52 @@ app.patch('/tweets/:id', async (req, res) => {
 		// if you want to redirect the user after the document has been successfully updated, you can use "updateOne" since returning the updated document does not matter.
 
 	} catch (e) {
-		res.status(400).send(e.message ?? e)
+		res.status(400).send(e.message)
 	}
 })
 
-// By convention, PUT request replaces the ENTIRE document
+// By convention, PUT request replaces the ENTIRE document (or row in relational databases)
 // In this example, "PUT /tweets/:id" route expects to receive data that follows the Tweet schema
 // ie data you passed into mongoose MUST provide the required fields else an error will be thrown
+// try not including one of the required field and see what happens
 app.put('/tweets/:id', async (req, res) => {
 	try {
-		// // METHOD 1
-		// // https://mongoosejs.com/docs/api.html#model_Model.findOneAndReplace
-		// res.send(
-		// 	await Tweet.findOneAndReplace(
-		// 		{ _id: req.params.id },
-		// 		req.body,
-		// 		{
-		// 			// Similar to "findOneAndUpdate", "findOneAndReplace" returns the document as it was BEFORE the update was applied
-		// 			// set "new" to true to return document AFTER update was applied.
-		// 			new: true
-		// 		}
-		// 	)
-		// )
-
-		// METHOD 2
-		// similar to "updateOne", "replaceOne" DOES NOT return the updated document
-		// it returns the following instead:
-		// {
-		// 	"n": 1,
-		// 	"nModified": 1,
-		// 	"ok": 1
-		// }
-		// where "n" is Number of documents matched and "nModified" is Number of documents modified
-		// https://mongoosejs.com/docs/api.html#query_Query-replaceOne
+		// METHOD 1
+		// https://mongoosejs.com/docs/api.html#model_Model.findOneAndReplace
 		res.send(
-			await Tweet.replaceOne(
+			await Tweet.findOneAndReplace(
 				{ _id: req.params.id },
-				req.body
+				req.body,
+				{
+					// Similar to "findOneAndUpdate", "findOneAndReplace" returns the document as it was BEFORE the update was applied
+					// set "new" to true to return document AFTER update was applied.
+					new: true
+				}
 			)
 		)
+
+		// // METHOD 2
+		// // similar to "updateOne", "replaceOne" DOES NOT return the updated document
+		// // it returns the following instead:
+		// // {
+		// // 	"n": 1,
+		// // 	"nModified": 1,
+		// // 	"ok": 1
+		// // }
+		// // where "n" is Number of documents matched and "nModified" is Number of documents modified
+		// // https://mongoosejs.com/docs/api.html#query_Query-replaceOne
+		// res.send(
+		// 	await Tweet.replaceOne(
+		// 		{ _id: req.params.id },
+		// 		req.body
+		// 	)
+		// )
 
 		// PUT vs PATCH
 		// https://stackoverflow.com/questions/28459418/use-of-put-vs-patch-methods-in-rest-api-real-life-scenarios
 
 	} catch (e) {
-		res.status(400).send(e.message ?? e)
+		res.status(400).send(e.message)
 	}
 })
 
@@ -195,7 +244,7 @@ app.delete('/tweets/:id', async (req, res) => {
 		if (deleteResponse.deletedCount === 1) {
 			res.send('Successfully deleted tweet using "deleteOne" method.')
 		} else {
-			throw 'The tweet you are trying to delete does not exist.'
+			throw new Error('The tweet you are trying to delete using "deleteOne" method does not exist.')
 		}
 
 		// // METHOD 2
@@ -207,7 +256,7 @@ app.delete('/tweets/:id', async (req, res) => {
 		// if (deleteResponse) {
 		// 	res.send('Successfully deleted tweet using "findOneAndDelete" method.')
 		// } else {
-		// 	throw 'The tweet you are trying to delete using "findOneAndDelete" method does not exist.'
+		// 	throw new Error('The tweet you are trying to delete using "findOneAndDelete" method does not exist.')
 		// }
 
 		// // METHOD 3
@@ -218,7 +267,7 @@ app.delete('/tweets/:id', async (req, res) => {
 		// if (deleteResponse) {
 		// 	res.send('Successfully deleted tweet using "findByIdAndDelete" method.')
 		// } else {
-		// 	throw 'The tweet you are trying to delete using "findByIdAndDelete" method does not exist.'
+		// 	throw new Error('The tweet you are trying to delete using "findByIdAndDelete" method does not exist.'
 		// }
 
 		// // METHOD 4
@@ -230,7 +279,7 @@ app.delete('/tweets/:id', async (req, res) => {
 		// if (deleteResponse) {
 		// 	res.send('Successfully deleted tweet using "findOneAndRemove" method.')
 		// } else {
-		// 	throw 'The tweet you are trying to delete using "findOneAndRemove" method does not exist.'
+		// 	throw new Error('The tweet you are trying to delete using "findOneAndRemove" method does not exist.'
 		// }
 
 		// // METHOD 5
@@ -241,7 +290,7 @@ app.delete('/tweets/:id', async (req, res) => {
 		// if (deleteResponse) {
 		// 	res.send('Successfully deleted tweet using "findByIdAndRemove" method.')
 		// } else {
-		// 	throw 'The tweet you are trying to delete using "findByIdAndRemove" method does not exist.'
+		// 	throw new Error('The tweet you are trying to delete using "findByIdAndRemove" method does not exist.'
 		// }
 
 		// //////// Comments ////////
@@ -253,7 +302,10 @@ app.delete('/tweets/:id', async (req, res) => {
 		// i would think the same applies for findByIdAndDelete vs findByIdAndRemove
 
 	} catch (e) {
-		res.status(400).send(e.message ?? e)
+		res.status(400).send({
+			name: e.name,
+			message: e.message ?? e
+		})
 	}
 })
 
