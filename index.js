@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 const Tweet = require('./schemas/tweet')
 const validateReactions = require('./middlewares/validateReactions')
 const utils = require('./utils/utils')
+const tweetsGenerator = require('./seed/tweetsGenerator')
 
 const mongoURI = 'mongodb://localhost:27017/tweets'
 const dbConnection = mongoose.connection
@@ -25,6 +26,18 @@ app.use(express.json())
 app.get('/tweets/clear', async (req, res) => {
 	try {
 		await utils.clearDataBase(Tweet)
+		res.send('ok')
+	} catch (e) {
+		res.status(400).send({
+			name: e.name,
+			message: e.message
+		})
+	}
+})
+
+app.get('/tweets/generate', async (req, res) => {
+	try {
+		await tweetsGenerator.generateRandomTweets()
 		res.send('ok')
 	} catch (e) {
 		res.status(400).send({
@@ -300,7 +313,6 @@ app.get('/tweets', async (req, res) => {
 		// 	.limit(resultsPerPage)
 		// 	.select('-_id title author')
 		// 	.then(tweets => {
-		// 		console.log(tweets.length)
 		// 		res.send(tweets)
 		// 	})
 		// 	.catch(err => {
@@ -393,21 +405,21 @@ app.patch('/tweets/:id/reactions', validateReactions, async (req, res) => {
 
 app.patch('/tweets/:id', async (req, res) => {
 	try {
-		// // METHOD 1
-		// const updatedTweet = await Tweet.findOneAndUpdate(
-		// 	{ _id: req.params.id },
-		// 	{
-		// 		title: `${req.body.title} using "findOneAndUpdate" method using HTTP PATCH`
-		// 	},
-		// 	{
-		// 		new: true
-		// 	}
-		// )
-		// if (updatedTweet) {
-		// 	res.send(updatedTweet)
-		// } else {
-		// 	throw new Error('Tweet you are trying to update does not exist.')
-		// }
+		// METHOD 1
+		const updatedTweet = await Tweet.findOneAndUpdate(
+			{ _id: req.params.id },
+			{
+				title: `${req.body.title} using "findOneAndUpdate" method using HTTP PATCH`
+			},
+			{
+				new: true
+			}
+		)
+		if (updatedTweet) {
+			res.send(updatedTweet)
+		} else {
+			throw new Error('Tweet you are trying to update does not exist.')
+		}
 
 		// // METHOD 2
 		// const updatedTweet = await Tweet.findByIdAndUpdate(

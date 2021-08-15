@@ -31,7 +31,7 @@ const getRandomDate = () => {
 	return new Date(today - Math.random()*dayVariance*24*60*60*1000)
 }
 
-const getRandomTweets = async () => {
+const generateRandomTweets = async () => {
 	const array = [...Array(100).keys()]
 	const promises = array.map(async () => {
 		const date = getRandomDate()
@@ -49,14 +49,13 @@ const getRandomTweets = async () => {
 			updatedAt: date
 		})
 	})
-	console.log('hi')
 	const tweetsArray = await Promise.all(promises)
 	fs.writeFileSync('./seed/tweetsSeed.json', JSON.stringify(tweetsArray))
-	console.log('complete')
+	console.log('Generate new tweets complete.')
 	return
 }
 
 module.exports = {
-	getRandomTweets
+	generateRandomTweets
 }
 
