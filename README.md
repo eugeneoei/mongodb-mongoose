@@ -89,7 +89,7 @@ try {
 			'reactions.likes': {
 				$gte: 50
 			}
-		},
+		}
 	)
 	res.send(tweets)
 } catch (e) {
@@ -131,7 +131,7 @@ try {
 				$gte: 40,
 				$lte: 60
 			}
-		},
+		}
 	)
 	res.send(tweets)
 } catch (e) {
@@ -159,7 +159,7 @@ try {
 					}
 				}
 			]
-		},
+		}
 	)
 	res.send(tweets)
 } catch (e) {
@@ -207,7 +207,7 @@ try {
 			'author': {
 				$ne: 'Peter Parker'
 			}
-		},
+		}
 	)
 	res.send(tweets)
 } catch (e) {
@@ -240,7 +240,7 @@ try {
 					}
 				}
 			]
-		},
+		}
 	)
 	res.send(tweets)
 } catch (e) {
@@ -288,7 +288,7 @@ try {
 					'Steve Rogers'
 				]
 			}
-		},
+		}
 	)
 	res.send(tweets)
 } catch (e) {
@@ -312,7 +312,7 @@ try {
 					author: 'Steve Rogers'
 				}
 			]	
-		},
+		}
 	)
 	res.send(tweets)
 } catch (e) {
@@ -358,7 +358,7 @@ try {
 					'Black Panther'
 				]
 			}
-		},
+		}
 	)
 	res.send(tweets)
 } catch (e) {
@@ -388,7 +388,7 @@ try {
 					author: 'Black Panther'
 				}
 			]	
-		},
+		}
 	)
 	res.send(tweets)
 } catch (e) {

@@ -48,7 +48,7 @@ app.get('/tweets', async (req, res) => {
 		// 		'reactions.likes': {
 		// 			$gte: 50
 		// 		}
-		// 	},
+		// 	}
 		// )
 		// console.log(tweets.length)
 		// res.send(tweets)
@@ -72,7 +72,7 @@ app.get('/tweets', async (req, res) => {
 		// 			$gte: 40,
 		// 			$lte: 60
 		// 		}
-		// 	},
+		// 	}
 		// )
 		// console.log(tweets.length)
 		// res.send(tweets)
@@ -92,7 +92,7 @@ app.get('/tweets', async (req, res) => {
 		// 				}
 		// 			}
 		// 		]
-		// 	},
+		// 	}
 		// )
 		// console.log(tweets.length)
 		// res.send(tweets)
@@ -122,7 +122,7 @@ app.get('/tweets', async (req, res) => {
 		// 		'author': {
 		// 			$ne: 'Peter Parker'
 		// 		}
-		// 	},
+		// 	}
 		// )
 		// console.log(tweets.length)
 		// res.send(tweets)
@@ -147,7 +147,7 @@ app.get('/tweets', async (req, res) => {
 		// 				}
 		// 			}
 		// 		]
-		// 	},
+		// 	}
 		// )
 		// console.log(tweets.length)
 		// res.send(tweets)
@@ -177,7 +177,7 @@ app.get('/tweets', async (req, res) => {
 		// 				'Steve Rogers'
 		// 			]
 		// 		}
-		// 	},
+		// 	}
 		// )
 		// console.log(tweets.length)
 		// res.send(tweets)
@@ -193,7 +193,7 @@ app.get('/tweets', async (req, res) => {
 		// 				author: 'Steve Rogers'
 		// 			}
 		// 		]	
-		// 	},
+		// 	}
 		// )
 		// console.log(tweets.length)
 		// res.send(tweets)
@@ -221,7 +221,7 @@ app.get('/tweets', async (req, res) => {
 		// 				'Black Panther'
 		// 			]
 		// 		}
-		// 	},
+		// 	}
 		// )
 		// console.log(tweets.length)
 		// res.send(tweets)
@@ -243,7 +243,7 @@ app.get('/tweets', async (req, res) => {
 		// 				author: 'Black Panther'
 		// 			}
 		// 		]	
-		// 	},
+		// 	}
 		// )
 		// console.log(tweets.length)
 		// res.send(tweets)
