@@ -915,7 +915,7 @@ try {
 }
 ```
 
-**Which should you use? `findOneAndDelete` or `findOneAndRemove`**
+**Which should you use? `findOneAndDelete` or `findOneAndRemove`?**
 
 According to the documentation,
 
