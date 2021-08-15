@@ -591,17 +591,20 @@ If you want all updated documents returned are **AFTER** the update, you can set
 
 ```js
 try {
-	res.send(
-		await Tweet.findByIdAndUpdate(
-			req.params.id,
-			{
-				title: `${req.body.title} using "findByIdAndUpdate" method using HTTP PATCH`
-			},
-			{
-				new: true
-			}
-		)
+	const updatedTweet = await Tweet.findByIdAndUpdate(
+		req.params.id,
+		{
+			title: `${req.body.title} using "findByIdAndUpdate" method using HTTP PATCH`
+		},
+		{
+			new: true
+		}
 	)
+	if (updatedTweet) {
+		res.send(updatedTweet)
+	} else {
+		throw new Error('Tweet you are trying to update does not exist.')
+	}
 } catch (e) {
 	res.status(400).send({
 		name: e.name,
@@ -617,14 +620,17 @@ Similar to `findOneAndUpdate`, `findByIdAndUpdate` returns the document as it wa
 
 ```js
 try {
-	res.send(
-		await Tweet.updateOne(
-			{ _id: req.params.id },
-			{
-				title: `${req.body.title} using "updateOne" method using HTTP PATCH`
-			}
-		)
+	const updatedTweet = await Tweet.updateOne(
+		{ _id: req.params.id },
+		{
+			title: `${req.body.title} using "updateOne" method using HTTP PATCH`
+		}
 	)
+	if (updatedTweet.nModified === 1) {
+		res.send('Tweet updated using "updateOne" method using HTTP PATCH')
+	} else {
+		throw new Error('Tweet you are trying to update does not exist.')
+	}
 } catch (e) {
 	res.status(400).send({
 		name: e.name,
@@ -674,15 +680,18 @@ Try not including one of the required fields when you call this endpoint. You wi
 
 ```js
 try {
-	res.send(
-		await Tweet.findOneAndReplace(
-			{ _id: req.params.id },
-			req.body,
-			{
-				new: true
-			}
-		)
+	const updatedTweet = await Tweet.findOneAndReplace(
+		{ _id: req.params.id },
+		req.body,
+		{
+			new: true
+		}
 	)
+	if (updatedTweet) {
+		res.send(updatedTweet)
+	} else {
+		throw new Error('Tweet you are trying to update does not exist.')
+	}
 } catch (e) {
 	res.status(400).send({
 		name: e.name,
@@ -698,12 +707,15 @@ Similar to `findOneAndUpdate`, `findOneAndReplace` returns the document as it wa
 
 ```js
 try {
-	res.send(
-		await Tweet.replaceOne(
-			{ _id: req.params.id },
-			req.body
-		)
+	const updatedTweet = await Tweet.replaceOne(
+		{ _id: req.params.id },
+		req.body
 	)
+	if (updatedTweet.nModified === 1) {
+		res.send('Tweet updated using "replaceOne" method using HTTP PUT')
+	} else {
+		throw new Error('Tweet you are trying to update does not exist.')
+	}
 } catch (e) {
 	res.status(400).send({
 		name: e.name,

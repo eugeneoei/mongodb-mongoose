@@ -8,10 +8,19 @@ const clearAndSeedDatabase = async collection => {
 		await collection.collection.drop()
 		await collection.collection.insertMany(tweetsSeed)
 	} catch(e) {
-		console.log(e)
+		throw e
+	}
+}
+
+const clearDataBase = async collection => {
+	try {
+		await collection.collection.drop()
+	} catch(e) {
+		throw e
 	}
 }
 
 module.exports = {
-	clearAndSeedDatabase
+	clearAndSeedDatabase,
+	clearDataBase
 }

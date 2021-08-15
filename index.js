@@ -22,15 +22,27 @@ mongoose.set('useFindAndModify', false)
 app.use(express.json())
 // mongoose.set('returnOriginal', false) // global settings such that all updated documents returned are AFTER the update
 
+app.get('/tweets/clear', async (req, res) => {
+	try {
+		await utils.clearDataBase(Tweet)
+		res.send('ok')
+	} catch (e) {
+		res.status(400).send({
+			name: e.name,
+			message: e.message
+		})
+	}
+})
+
 app.get('/tweets/clear-and-seed', async (req, res) => {
 	try {
 		await utils.clearAndSeedDatabase(Tweet)
 		res.send('ok')
 	} catch (e) {
 		res.status(400).send({
-	name: e.name,
-	message: e.message
-})
+			name: e.name,
+			message: e.message
+		})
 	}
 })
 
@@ -381,44 +393,50 @@ app.patch('/tweets/:id/reactions', validateReactions, async (req, res) => {
 
 app.patch('/tweets/:id', async (req, res) => {
 	try {
-		// METHOD 1
-		const updatedTweet = await Tweet.findOneAndUpdate(
-			{ _id: req.params.id },
-			{
-				title: `${req.body.title} using "findOneAndUpdate" method using HTTP PATCH`
-			},
-			{
-				new: true
-			}
-		)
-		if (updatedTweet) {
-			res.send(updatedTweet)
-		} else {
-			throw new Error('Tweet you are trying to update does not exist.')
-		}
+		// // METHOD 1
+		// const updatedTweet = await Tweet.findOneAndUpdate(
+		// 	{ _id: req.params.id },
+		// 	{
+		// 		title: `${req.body.title} using "findOneAndUpdate" method using HTTP PATCH`
+		// 	},
+		// 	{
+		// 		new: true
+		// 	}
+		// )
+		// if (updatedTweet) {
+		// 	res.send(updatedTweet)
+		// } else {
+		// 	throw new Error('Tweet you are trying to update does not exist.')
+		// }
 
 		// // METHOD 2
-		// res.send(
-		// 	await Tweet.findByIdAndUpdate(
-		// 		req.params.id,
-		// 		{
-		// 			title: `${req.body.title} using "findByIdAndUpdate" method using HTTP PATCH`
-		// 		},
-		// 		{
-		// 			new: true
-		// 		}
-		// 	)
+		// const updatedTweet = await Tweet.findByIdAndUpdate(
+		// 	req.params.id,
+		// 	{
+		// 		title: `${req.body.title} using "findByIdAndUpdate" method using HTTP PATCH`
+		// 	},
+		// 	{
+		// 		new: true
+		// 	}
 		// )
+		// if (updatedTweet) {
+		// 	res.send(updatedTweet)
+		// } else {
+		// 	throw new Error('Tweet you are trying to update does not exist.')
+		// }
 
 		// // METHOD 3
-		// res.send(
-		// 	await Tweet.updateOne(
-		// 		{ _id: req.params.id },
-		// 		{
-		// 			title: `${req.body.title} using "updateOne" method using HTTP PATCH`
-		// 		}
-		// 	)
+		// const updatedTweet = await Tweet.updateOne(
+		// 	{ _id: req.params.id },
+		// 	{
+		// 		title: `${req.body.title} using "updateOne" method using HTTP PATCH`
+		// 	}
 		// )
+		// if (updatedTweet.nModified === 1) {
+		// 	res.send('Tweet updated using "updateOne" method using HTTP PATCH')
+		// } else {
+		// 	throw new Error('Tweet you are trying to update does not exist.')
+		// }
 
 	} catch (e) {
 		res.status(400).send({
@@ -432,23 +450,29 @@ app.patch('/tweets/:id', async (req, res) => {
 app.put('/tweets/:id', async (req, res) => {
 	try {
 		// METHOD 1
-		res.send(
-			await Tweet.findOneAndReplace(
-				{ _id: req.params.id },
-				req.body,
-				{
-					new: true
-				}
-			)
+		const updatedTweet = await Tweet.findOneAndReplace(
+			{ _id: req.params.id },
+			req.body,
+			{
+				new: true
+			}
 		)
+		if (updatedTweet) {
+			res.send(updatedTweet)
+		} else {
+			throw new Error('Tweet you are trying to update does not exist.')
+		}
 
 		// // METHOD 2
-		// res.send(
-		// 	await Tweet.replaceOne(
-		// 		{ _id: req.params.id },
-		// 		req.body
-		// 	)
+		// const updatedTweet = await Tweet.replaceOne(
+		// 	{ _id: req.params.id },
+		// 	req.body
 		// )
+		// if (updatedTweet.nModified === 1) {
+		// 	res.send('Tweet updated using "replaceOne" method using HTTP PUT')
+		// } else {
+		// 	throw new Error('Tweet you are trying to update does not exist.')
+		// }
 
 	} catch (e) {
 		res.status(400).send({
