@@ -22,7 +22,7 @@ In each of these routes in `index.js`, there are different implmentations writte
 
 This `mongodb-mongoose` example is an API only server. There is no view layer. To interact with the endpoints, use [Postman](https://www.postman.com/), [Insomnia](https://insomnia.rest/) or `curl`.
 
-***NOTE**: `PATCH` updates **part** of a tweet. `PUT` updates **whole** tweet. There is a difference between the two. More on this in the respective routes!*
+***NOTE**: `PATCH` updates **part** of a tweet. `PUT` updates **whole** tweet. There are differences between the two. More on this in the respective routes!*
 
 
 # To chain or not to chain?
