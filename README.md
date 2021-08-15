@@ -518,7 +518,7 @@ try {
 
 # `POST /tweets` route
 
-I did not come across any other methods besides `create` to add a document to a colelction.
+I did not come across any other methods besides `create` to add a document to a collection.
 
 `json` payload example:
 
