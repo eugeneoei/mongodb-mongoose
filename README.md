@@ -8,13 +8,13 @@ I've not built an app with `mongodb` and `mongoose` as the driver. so I'm defini
 
 In the `index.js`, I have structured routes for `GET`, `POST`, `PUT`, `PATCH` and `DELETE`. In summar:
 
-- `GET /tweets` - get all tweets
-- `GET /tweets/:id` - get one tweet
-- `POST /tweets` - create a new tweet
-- `PATCH /tweets/:id` - updates **part** of a tweet
-- `PUT /tweets/:id` - updates **whole** tweet
-- `PATCH /tweets/:id/reactions` - increases/decreases count for "likes" and "dislikes"
-- `DELETE /tweets/:id` - delete a tweet
+- [`GET /tweets`](#get-tweets-route) - get all tweets
+- [`GET /tweets/:id`](#get-tweetsid-route) - get one tweet
+- [`POST /tweets`](#post-tweets-route) - create a new tweet
+- [`PATCH /tweets/:id`](#patch-tweetsid-route) - updates **part** of a tweet
+- [`PUT /tweets/:id`](#put-tweetsid-route) - updates **whole** tweet
+- [`PATCH /tweets/:id/reactions`](#patch-tweetsidreactions-route) - increases/decreases count for "likes" and "dislikes"
+- [`DELETE /tweets/:id`](#delete-tweetsid-route) - delete a tweet
 
 In each of these routes in `index.js`, there are different implmentations written to achieve the same result. Uncomment them accordingly and experiment with the different implementations on your own.
 
@@ -43,15 +43,21 @@ Regardless, the choice is yours. Though, if you decide to go with chaining, I wo
 
 The following are the requirements I have set for myself for this route to understand the different methods:
 
-1. Show all tweets (note that there are no passing of url query parameters for this endpoint)
-2. Show tweets where "likes" >= 50
-3. Show tweets where 40 <= "likes" <= 60
-4. Show tweets where "likes" > 20, "dislikes" <= 60 and "author" is not "Peter Parker"
-5. Show tweets where "author" is either "Thor" or "Steve Rogers"
-6. Show tweets where "author" are not "Hawkeye", "Dr. Banner", "Thanos" and "Black Panther"
+1. [Show all tweets (note that there are no passing of url query parameters for this endpoint)](#r1---show-all-tweets)
+
+2. [Show tweets where "likes" >= 50](#r2---show-tweets-where-likes--50)
+
+3. [Show tweets where 40 <= "likes" <= 60](#r3---show-tweets-where-40-likes--60)
+
+4. [Show tweets where "likes" > 20, "dislikes" <= 60 and "author" is not "Peter Parker"](#r4---show-tweets-where-likes--20-dislikes--60-and-author-is-not-peter-parker)
+
+5. [Show tweets where "author" is either "Thor" or "Steve Rogers"](#r5---show-tweets-where-author-is-either-thor-or-steve-rogers)
+
+6. [Show tweets where "author" are not "Hawkeye", "Dr. Banner", "Thanos" and "Black Panther"](#r6---show-tweets-where-author-are-not-hawkeye-dr-banner-thanos-and-black-panther)
+
 7. Paginate tweets
-	- Show page 1 tweets and 10 tweets per page with only "title" and "author" fields
-	- Show page 2 tweets and 50 tweets per page with all fields
+	- [Show page 1 tweets and 10 tweets per page with only "title" and "author" fields](#r7a---paginate-tweets-show-page-1-tweets-and-10-tweets-per-page-with-only-title-and-author-fields)
+	- [Show page 2 tweets and 50 tweets per page with all fields](#r7b---paginate-tweets-show-page-2-tweets-and-50-tweets-per-page-with-all-fields)
 
 ## R1 - Show all tweets
 
