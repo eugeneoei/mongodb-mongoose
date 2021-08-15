@@ -518,7 +518,7 @@ try {
 
 # `POST /tweets` route
 
-I did not come across any another methods besides `create` to add a document to a colelction.
+I did not come across any other methods besides `create` to add a document to a colelction.
 
 `json` payload example:
 
@@ -582,7 +582,7 @@ try {
 ```
 
 By default, `findOneAndUpdate` returns the document as it was **BEFORE** the update was applied.
-If you set the options "new" to `true`, `findOneAndUpdate` will instead return document **AFTER** update was applied.
+If you set the options "new" to `true`, `findOneAndUpdate` will instead return the document **AFTER** update was applied.
 
 If you want all updated documents returned are **AFTER** the update, you can set it globally using `mongoose.set('returnOriginal', false)` at the start of your entry file (ie `index.js` or `server.js` or whichever file that is). Do note that there are other flags you can set as well. As always, refer to the docs.
 
@@ -643,7 +643,9 @@ try {
 ```
 where `n` is number of documents matched and `nModified` is number of documents modified.
 
-**Which should you use? It all depends on the user flow you have in mind.**
+**Which should you use?**
+
+It all depends on the user flow you have in mind.
 
 If you want to show the updated document after edit is successful, then i would say use `findOneAndUpdate` or `findByIdAndUpdate`.
 
@@ -689,7 +691,7 @@ try {
 }
 ```
 
-Similar to `findOneAndUpdate`, `findOneAndReplace` returns the document as it was **BEFORE** the update was applied. Set options "new" to `true` to return document **AFTER** update was applied.
+Similar to `findOneAndUpdate`, `findOneAndReplace` returns the document as it was **BEFORE** the update was applied. Set options "new" to `true` to return the document **AFTER** update was applied.
 
 **Method 2** using
 [replaceOne](https://mongoosejs.com/docs/api.html#query_Query-replaceOne).
@@ -738,7 +740,7 @@ Trying out updating nested fields.
 
 // "type" accepts either "likes" or "dislikes"
 // "action" accepts either "increment" or "decrement"
-// No particular rules for these. I just design the routes to accept these fields and values
+// No particular rules for these. I just design the routes to accept these key-value pairs.
 ```
 
 Using [findById](https://mongoosejs.com/docs/api.html#model_Model.findById).
@@ -823,7 +825,7 @@ If document is not found, response's "deletedCount" will be 0. This is the respo
 }
 ```
 
-Therefore we need to handle manually. But of course, as Zhiquan mentioned during in one of his lessons, returning an error saying that document does not exist can potentially be a security vulnerability. In this case, I decide to handle it regardless for learning purposes.
+Therefore we need to handle manually. But of course, as Zhiquan mentioned during one of his lessons, returning an error indicating that document does not exist can potentially be a security vulnerability. In this case, I decide to handle it regardless for learning purposes.
 
 **Method 2** using
 [findOneAndDelete](https://mongoosejs.com/docs/api.html#model_Model.findOneAndDelete).
@@ -913,14 +915,13 @@ try {
 }
 ```
 
-**`findOneAndDelete` vs `findOneAndRemove` Which should you use?**
+**Which should you use? `findOneAndDelete` or `findOneAndRemove`**
 
 According to the documentation,
 
 > `Model.findOneAndDelete()` differs slightly from `Model.findOneAndRemove()` in that `findOneAndRemove()` becomes a MongoDB `findAndModify()` command, as opposed to a `findOneAndDelete()` command. For most mongoose use cases, this distinction is purely pedantic. You should use `findOneAndDelete()` unless you have a good reason not to.
 
 I would think the same applies for `findByIdAndDelete` vs `findByIdAndRemove`.
-
 
 # Additional Readings
 
