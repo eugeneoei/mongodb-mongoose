@@ -3,7 +3,6 @@ const app = express()
 const mongoose = require('mongoose')
 const Tweet = require('./schemas/tweet')
 const validateReactions = require('./middlewares/validateReactions')
-// const validateTweetsQueryParameters = require('./middlewares/validateTweetsQueryParameters')
 const utils = require('./utils/utils')
 
 const mongoURI = 'mongodb://localhost:27017/tweets'

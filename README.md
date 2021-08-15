@@ -43,7 +43,7 @@ Regardless, the choice is yours. Though, if you decide to go with chaining, I wo
 
 The following are the requirements I have set for myself for this route to understand the different methods:
 
-1. [Show all tweets (note that there are no passing of url query parameters for this endpoint)](#r1---show-all-tweets)
+1. [Show all tweets](#r1---show-all-tweets)
 
 2. [Show tweets where "likes" >= 50](#r2---show-tweets-where-likes--50)
 
@@ -58,6 +58,10 @@ The following are the requirements I have set for myself for this route to under
 7. Paginate tweets
 	- [Show page 1 tweets and 10 tweets per page with only "title" and "author" fields](#r7a---paginate-tweets-show-page-1-tweets-and-10-tweets-per-page-with-only-title-and-author-fields)
 	- [Show page 2 tweets and 50 tweets per page with all fields](#r7b---paginate-tweets-show-page-2-tweets-and-50-tweets-per-page-with-all-fields)
+
+Do note that I did not use any url query parameters for this endpoint. Objective is to experiment with the different implementations and methods avaialble in `mongoose`.
+
+You can improve this route by writing your own custom middleware that validates the url query parameters this route receives. It is entirely up to you how strict you want to implement this validation.
 
 ## R1 - Show all tweets
 
