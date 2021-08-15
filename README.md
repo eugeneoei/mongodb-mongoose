@@ -1,6 +1,6 @@
-# Objectives
+# Objective
 
-The objectives is not to tell how you should query from `mongodb` through `mongoose` and say which is right or wrong. Rather, to demonstrate the different implmentations to achieve the same result.
+The objective is not to tell how you should query from `mongodb` through `mongoose` and say which is right or wrong. Rather, to demonstrate the different implmentations to achieve the same result.
 
 Ultimately, it depends what features are required and from there, you write your APIs accordingly to support these features requirements.
 
