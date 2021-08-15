@@ -36,15 +36,13 @@ const generateRandomTweets = async () => {
 	const promises = array.map(async () => {
 		const date = getRandomDate()
 		return await ({
-			"title": await getRandomTitle(),
-			"body": await getRandomBody(),
+			title: await getRandomTitle(),
+			body: await getRandomBody(),
 			author: getRandomAuthor(),
 			reactions: {
 				likes: getRandomBetweenOneAndHundred(),
 				dislikes: getRandomBetweenOneAndHundred()
 			},
-
-			// new Date(today - Math.random()*7*24*60*60*1000)
 			createdAt: date,
 			updatedAt: date
 		})
