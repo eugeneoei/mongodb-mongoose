@@ -935,9 +935,15 @@ According to the documentation,
 
 I would think the same applies for `findByIdAndDelete` vs `findByIdAndRemove`.
 
+# Todos
+
+- Aggregation
+- Establish relationship between 2 collections
+
 # Additional Readings
 
 - [How find() Works in Mongoose](https://thecodebarbarian.com/how-find-works-in-mongoose.html)
+- [List of `$` operators aka "Query and Projection Operators"](https://docs.mongodb.com/manual/reference/operator/query/#query-and-projection-operators)
 - Read the `mongoose` docs :joy:
 
 
