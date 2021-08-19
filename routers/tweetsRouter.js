@@ -1,14 +1,15 @@
 const express = require('express')
 const Tweet = require('../schemas/tweet')
-const validateReactions = require('../middlewares/validateReactions')
-const utils = require('../utils/utils')
 const tweetsGenerator = require('../seed/tweetsGenerator')
+const User = require('../schemas/user')
+const validateReactions = require('../middlewares/validateReactions')
+const utils = require('../utils/tweetUtils')
 
 const router = express.Router()
 
 router.get('/clear', async (req, res) => {
 	try {
-		await utils.clearDataBase(Tweet)
+		await utils.clearTweetCollection(Tweet)
 		res.send('ok')
 	} catch (e) {
 		res.status(400).send({
@@ -32,7 +33,7 @@ router.get('/generate', async (req, res) => {
 
 router.get('/clear-and-seed', async (req, res) => {
 	try {
-		await utils.clearAndSeedDatabase(Tweet)
+		await utils.clearAndSeedTweetCollection(Tweet)
 		res.send('ok')
 	} catch (e) {
 		res.status(400).send({
@@ -42,328 +43,126 @@ router.get('/clear-and-seed', async (req, res) => {
 	}
 })
 
-router.get('/aggregate', async (req, res) => {
-	try {
+// // https://docs.mongodb.com/manual/core/aggregation-pipeline/
+// // https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/
+// // https://docs.mongodb.com/manual/reference/operator/aggregation/
+// // https://docs.mongodb.com/manual/reference/operator/aggregation/addFields/
+// router.get('/aggregate', async (req, res) => {
+// 	try {
 
-		// const aggregatedResults = await Tweet.aggregate([
-		// 	{
-		// 		$addFields: {
-		// 			netReactions: {
-		// 				$subtract: ['$reactions.likes', '$reactions.dislikes']
-		// 			},
-		// 			secondsSinceCreation: {
-		// 				$subtract: [new Date().getTime(), '$createdAt']
-		// 			}
-		// 		}
-		// 	},
-		// 	{
-		// 		$addFields: {
-		// 			daysSinceCreation: {
-		// 				// use $function to defined custom aggregation expressions???
-		// 				'$divide': ['$secondsSinceCreation', 86400000]
-		// 			}
-		// 		}
-		// 	},
-		// 	{
-		// 		$addFields: {
-		// 			daysSinceCreation: {
-		// 				$floor: '$daysSinceCreation'
-		// 			}
-		// 		}
-		// 	}
-		// ])
-		// res.send(aggregatedResults)
-
-
-		const aggregatedResults = await Tweet.aggregate([
-			{
-				$match: {
-					author: 'Steve Rogers'
-				}
-			},
-			{
-				$limit: 10
-			}
-		])
-		res.send(aggregatedResults)
+// 		// const aggregatedResults = await Tweet.aggregate([
+// 		// 	{
+// 		// 		$addFields: {
+// 		// 			netReactions: {
+// 		// 				$subtract: ['$reactions.likes', '$reactions.dislikes']
+// 		// 			},
+// 		// 			secondsSinceCreation: {
+// 		// 				$subtract: [new Date().getTime(), '$createdAt']
+// 		// 			}
+// 		// 		}
+// 		// 	},
+// 		// 	{
+// 		// 		$addFields: {
+// 		// 			daysSinceCreation: {
+// 		// 				// use $function to defined custom aggregation expressions???
+// 		// 				'$divide': ['$secondsSinceCreation', 86400000]
+// 		// 			}
+// 		// 		}
+// 		// 	},
+// 		// 	{
+// 		// 		$addFields: {
+// 		// 			daysSinceCreation: {
+// 		// 				$floor: '$daysSinceCreation'
+// 		// 			}
+// 		// 		}
+// 		// 	}
+// 		// ])
+// 		// res.send(aggregatedResults)
 
 
-		// const tweets = await Tweet.aggregate([
-		// 	{
-		// 		$match: {
-		// 			'reactions.likes': {
-		// 				$gte: 50
-		// 			}
-		// 		}	
-		// 	}
-		// ])
-		// console.log(tweets.length)
-		// res.send(tweets)
-	} catch(e) {
-		res.status(400).send({
-			name: e.name,
-			message: e.message
-		})
-	}
-})
+// 		const aggregatedResults = await Tweet.aggregate([
+// 			{
+// 				$match: {
+// 					author: 'Steve Rogers'
+// 				}
+// 			},
+// 			{
+// 				$limit: 10
+// 			}
+// 		])
+// 		res.send(aggregatedResults)
+
+
+// 		// const tweets = await Tweet.aggregate([
+// 		// 	{
+// 		// 		$match: {
+// 		// 			'reactions.likes': {
+// 		// 				$gte: 50
+// 		// 			}
+// 		// 		}	
+// 		// 	}
+// 		// ])
+// 		// console.log(tweets.length)
+// 		// res.send(tweets)
+// 	} catch(e) {
+// 		res.status(400).send({
+// 			name: e.name,
+// 			message: e.message
+// 		})
+// 	}
+// })
 
 router.get('', async (req, res) => {
 	try {
-		// Requirement 1
-		const tweets = await Tweet.find({})
-		res.send(tweets)
 
-		// // Requirement 2 method 1
-		// const tweets = await Tweet.find(
-		// 	{
-		// 		'reactions.likes': {
-		// 			$gte: 50
-		// 		}
-		// 	}
-		// )
-		// console.log(tweets.length)
-		// res.send(tweets)
-
-		// // Requirement 2 method 2
-		// await Tweet
-		// 	.where('reactions.likes')
-		// 	.gte(50)
-		// 	.then(tweets => {
-		// 		console.log(tweets.length)
-		// 		res.send(tweets)
-		// 	})
-		// 	.catch(err => {
-		// 		throw err
-		// 	})
-		
-		// // Requirement 3 method 1
-		// const tweets = await Tweet.find(
-		// 	{
-		// 		'reactions.likes': {
-		// 			$gte: 40,
-		// 			$lte: 60
-		// 		}
-		// 	}
-		// )
-		// console.log(tweets.length)
-		// res.send(tweets)
-
-		// // Requirement 3 method 2
-		// const tweets = await Tweet.find(
-		// 	{
-		// 		$and: [
-		// 			{
-		// 				'reactions.likes': {
-		// 					$gte: 40
-		// 				}
-		// 			},
-		// 			{ 
-		// 				'reactions.likes': {
-		// 					$lte: 60
-		// 				}
-		// 			}
-		// 		]
-		// 	}
-		// )
-		// console.log(tweets.length)
-		// res.send(tweets)
-
-		// // Requirement 3 method 3
-		// await Tweet
-		// 	.where('reactions.likes')
-		// 	.gte(40)
-		// 	.lte(60)
-		// 	.then(tweets => {
-		// 		console.log(tweets.length)
-		// 		res.send(tweets)
-		// 	})
-		// 	.catch(err => {
-		// 		throw err
-		// 	})
-
-		// // Requirement 4 - method 1
-		// const tweets = await Tweet.find(
-		// 	{
-		// 		'reactions.likes': {
-		// 			$gt: 20
-		// 		},
-		// 		'reactions.dislikes': {
-		// 			$lte: 60
-		// 		},
-		// 		'author': {
-		// 			$ne: 'Peter Parker'
-		// 		}
-		// 	}
-		// )
-		// console.log(tweets.length)
-		// res.send(tweets)
-
-		// // Requirement 4 - method 2
-		// const tweets = await Tweet.find(
-		// 	{
-		// 		$and: [
-		// 			{
-		// 				'reactions.likes': {
-		// 					$gt: 20
-		// 				}
-		// 			},
-		// 			{ 
-		// 				'reactions.dislikes': {
-		// 					$lte: 60
-		// 				}
-		// 			},
-		// 			{
-		// 				'author': {
-		// 					$ne: 'Peter Parker'
-		// 				}
-		// 			}
-		// 		]
-		// 	}
-		// )
-		// console.log(tweets.length)
-		// res.send(tweets)
-
-		// // Requirement 4 - method 3
-		// await Tweet
-		// 	.where('reactions.likes')
-		// 	.gt(20)
-		// 	.where('reactions.dislikes')
-		// 	.lte(60)
-		// 	.where('author')
-		// 	.ne('Peter Parker')
-		// 	.then(tweets => {
-		// 		console.log(tweets.length)
-		// 		res.send(tweets)
-		// 	})
-		// 	.catch(err => {
-		// 		throw err
-		// 	})
-
-		// // Requirement 5 - method 1
-		// const tweets = await Tweet.find(
-		// 	{
-		// 		author: {
-		// 			$in: [
-		// 				'Thor',
-		// 				'Steve Rogers'
-		// 			]
-		// 		}
-		// 	}
-		// )
-		// console.log(tweets.length)
-		// res.send(tweets)
-
-		// // Requirement 5 - method 2
-		// const tweets = await Tweet.find(
-		// 	{
-		// 		$or: [
-		// 			{
-		// 				author: 'Thor'
-		// 			},
-		// 			{
-		// 				author: 'Steve Rogers'
-		// 			}
-		// 		]	
-		// 	}
-		// )
-		// console.log(tweets.length)
-		// res.send(tweets)
-
-		// // Requirement 5 - method 3
-		// await Tweet
-		// 	.where('author')
-		// 	.in(['Thor', 'Steve Rogers'])
-		// 	.then(tweets => {
-		// 		console.log(tweets.length)
-		// 		res.send(tweets)
-		// 	})
-		// 	.catch(err => {
-		// 		throw err
-		// 	})
-
-		// // Requirement 6 - method 1
-		// const tweets = await Tweet.find(
-		// 	{
-		// 		author: {
-		// 			$nin: [
-		// 				'Hawkeye',
-		// 				'Dr. Banner',
-		// 				'Thanos',
-		// 				'Black Panther'
-		// 			]
-		// 		}
-		// 	}
-		// )
-		// console.log(tweets.length)
-		// res.send(tweets)
-
-		// // Requirement 6 - method 2
-		// const tweets = await Tweet.find(
-		// 	{
-		// 		$nor: [
-		// 			{
-		// 				author: 'Hawkeye'
-		// 			},
-		// 			{
-		// 				author: 'Dr. Banner'
-		// 			},
-		// 			{
-		// 				author: 'Thanos'
-		// 			},
-		// 			{
-		// 				author: 'Black Panther'
-		// 			}
-		// 		]	
-		// 	}
-		// )
-		// console.log(tweets.length)
-		// res.send(tweets)
-
-		// // Requirement 6 - method 3
-		// await Tweet
-		// 	.where('author')
-		// 	.nin([
-		// 		'Hawkeye',
-		// 		'Dr. Banner',
-		// 		'Thanos',
-		// 		'Black Panther'
-		// 	])
-		// 	.then(tweets => {
-		// 		console.log(tweets.length)
-		// 		res.send(tweets)
-		// 	})
-		// 	.catch(err => {
-		// 		throw err
-		// 	})
-
-		// // Requirement 7a - method 1
+		// // https://mongoosejs.com/docs/api/model.html#model_Model.populate
 		// const page = 1
-		// const resultsPerPage = 10
+		// const resultsPerPage = 2
 		// const tweets = await Tweet.find(
 		// 	{},
-		// 	'-_id title author',
-		// 	{
-		// 		skip: resultsPerPage * (page - 1),
-		// 		limit: resultsPerPage
-		// 	}
+		// 	'title'
 		// )
-		// console.log(tweets.length)
+		// .populate({
+		// 	path: 'comments',
+		// 	// perDocumentLimit: 3, // <-- limits number of ref results
+		// 	// limit: 2,
+		// 	// match: {
+		// 	// 	author: {
+		// 	// 		$eq: 'This is a comment author 2'
+		// 	// 	}
+		// 	// },
+		// 	select: ['author', 'body'],
+		// 	// // transform is like map
+		// 	// transform: comment => {
+		// 	// 	console.log(comment)
+		// 	// 	return comment
+		// 	// 	// return {
+		// 	// 	// 	...comment,
+		// 	// 	// 	body: `${comment.body} transformed`
+		// 	// 	// }
+		// 	// }
+		// 	// options: {
+		// 	// 	skip: resultsPerPage * (page - 1),
+		// 	// 	limit: resultsPerPage
+		// 	// }
+		// })
+		// .limit(2) // <-- limits number of tweets 
+		// // .select('title').populate('author')
 		// res.send(tweets)
 
-		// // Requirement 7a - method 2
-		// const page = 1
-		// const resultsPerPage = 10
-		// await Tweet
-		// 	.find()
-		// 	.skip(resultsPerPage * (page - 1))
-		// 	.limit(resultsPerPage)
-		// 	.select('-_id title author')
-		// 	.then(tweets => {
-		// 		res.send(tweets)
-		// 	})
-		// 	.catch(err => {
-		// 		throw err
-		// 	})
+
+		const tweets = await Tweet.find(
+			{}
+		)
+		.populate([
+			{
+				path: 'user'
+			},
+			{
+				path: 'user.tweets'
+			}
+		])
+		res.send(tweets)
 
 	} catch (e) {
 		res.status(400).send({
@@ -375,30 +174,106 @@ router.get('', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
 	try {
-		// METHOD 1
-		const tweet = await Tweet.findOne({
-			_id: req.params.id
-		})
-		const now = new Date()
-		const createdAt = new Date(tweet.createdAt)
-		let elapsed = now.getTime() - createdAt.getTime()
-		// console.log('now >>', now.getTime())
-		// console.log('createdAt >>', createdAt.getTime())
-		console.log(elapsed)
-		console.log(elapsed/86400000)
-		if (tweet) {
-			res.send(tweet)
-		} else {
-			res.status(404).send('Tweet not found')
-		}
 
-		// // METHOD 2
 		// const tweet = await Tweet.findById(req.params.id)
 		// if (tweet) {
 		// 	res.send(tweet)
 		// } else {
 		// 	res.status(404).send('Tweet not found')
 		// }
+
+		const tweet = await Tweet.findById(
+			req.params.id
+		)
+		// .populate(
+		// 	{
+		// 		path: 'user',
+		// 		select: ['firstName', 'lastName', '_id']
+		// 	}
+		// )
+		// .populate(
+		// 	{
+		// 		path: 'comments',
+		// 		select: ['body', '_id']
+		// 	}
+		// )
+		.populate([
+			{
+				path: 'user',
+				select: ['firstName', 'lastName', '_id']
+			},
+			{
+				path: 'comments',
+				select: ['body', '_id'],
+				populate: {
+					path: 'user',
+					select: ['firstName', 'lastName', '_id']
+				}
+			}
+		])
+		res.send(tweet)
+
+
+		// // https://mongoosejs.com/docs/api/model.html#model_Model.populate
+		// const page = 2
+		// const resultsPerPage = 2
+		// const tweet = await Tweet.findById(
+		// 	req.params.id,
+		// 	'title'
+		// )
+		// .populate({
+		// 	path: 'comments',
+		// 	// // "perDocumentLimit" limits number of ref documents. doesnt allow for pagination
+		// 	// perDocumentLimit: resultsPerPage,
+
+		// 	// "match" to filter ref documents
+		// 	match: {
+		// 		author: {
+		// 			$eq: 'This is a comment author 2'
+		// 		}
+		// 	},
+
+		// 	select: ['author', 'body'],
+		// 	options: {
+		// 		// "skip" and "limit" in options to paginate ref documents
+		// 		skip: resultsPerPage * (page - 1),
+		// 		limit: resultsPerPage
+		// 	}
+		// })
+		// if (tweet) {
+		// 	res.send(tweet)
+		// } else {
+		// 	res.status(404).send('Tweet not found')
+		// }
+		// // .populate({
+		// // 	path: 'comments',
+		// // 	// perDocumentLimit: 3,
+		// // 	// limit: 2,
+		// // 	// match: {
+		// // 	// 	author: {
+		// // 	// 		$eq: 'This is a comment author 2'
+		// // 	// 	}
+		// // 	// },
+		// // 	select: ['author', 'body'],
+		// // 	// // transform is like map
+		// // 	// transform: comment => {
+		// // 	// 	console.log(comment)
+		// // 	// 	return comment
+		// // 	// 	// return {
+		// // 	// 	// 	...comment,
+		// // 	// 	// 	body: `${comment.body} transformed`
+		// // 	// 	// }
+		// // 	// }
+		// // 	options: {
+		// // 		skip: resultsPerPage * (page - 1),
+		// // 		limit: resultsPerPage
+		// // 	}
+		// // })
+		// // .limit(2)
+		// // // .select('title').populate('author')
+		// // res.send(tweets)
+
+
 	} catch (e) {
 		res.status(400).send({
 			name: e.name,
@@ -409,7 +284,28 @@ router.get('/:id', async (req, res) => {
 
 router.post('', async (req, res) => {
 	try {
-		res.send(await Tweet.create(req.body))
+
+		const { title, body, userId } = req.body
+
+		const user = await User.findById(userId)
+
+		// attach user to tweet
+		const tweet = await Tweet.create({
+			title,
+			body,
+			user
+		})
+
+		// attach tweet to user
+		await User.findByIdAndUpdate(
+			userId,
+			{
+				$push: {
+					tweets: tweet
+				}
+			}
+		)
+		res.redirect(`/tweets/${tweet['_id']}`)
 	} catch (e) {
 		res.status(400).send({
 			name: e.name,
@@ -550,16 +446,16 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
 	try {
 		
-		// METHOD 1
-		const deleteResponse = await Tweet.deleteOne({
-			_id: req.params.id
-		})
-		console.log(deleteResponse)
-		if (deleteResponse.deletedCount === 1) {
-			res.send('Successfully deleted tweet using "deleteOne" method.')
-		} else {
-			throw new Error('The tweet you are trying to delete using "deleteOne" method does not exist.')
-		}
+		// // METHOD 1
+		// const deleteResponse = await Tweet.deleteOne({
+		// 	_id: req.params.id
+		// })
+		// console.log(deleteResponse)
+		// if (deleteResponse.deletedCount === 1) {
+		// 	res.send('Successfully deleted tweet using "deleteOne" method.')
+		// } else {
+		// 	throw new Error('The tweet you are trying to delete using "deleteOne" method does not exist.')
+		// }
 
 		// // METHOD 2
 		// const deleteResponse = await Tweet.findOneAndDelete({
@@ -571,13 +467,14 @@ router.delete('/:id', async (req, res) => {
 		// 	throw new Error('The tweet you are trying to delete using "findOneAndDelete" method does not exist.')
 		// }
 
-		// // METHOD 3
-		// const deleteResponse = await Tweet.findByIdAndDelete(req.params.id)
-		// if (deleteResponse) {
-		// 	res.send('Successfully deleted tweet using "findByIdAndDelete" method.')
-		// } else {
-		// 	throw new Error('The tweet you are trying to delete using "findByIdAndDelete" method does not exist.'
-		// }
+		// METHOD 3
+		const deleteResponse = await Tweet.findByIdAndDelete(req.params.id)
+		console.log(deleteResponse)
+		if (deleteResponse) {
+			res.send('Successfully deleted tweet using "findByIdAndDelete" method.')
+		} else {
+			throw new Error('The tweet you are trying to delete using "findByIdAndDelete" method does not exist.')
+		}
 
 		// // METHOD 4
 		// const deleteResponse = await Tweet.findOneAndRemove({

@@ -1,7 +1,9 @@
 const tweetsSeed = require('../seed/tweetsSeed')
 
-const clearAndSeedDatabase = async collection => {
+const clearAndSeedTweetCollection = async collection => {
 	try {
+		// take 10 random comments and seed?
+
 		await collection.collection.drop()
 		await collection.collection.insertMany(tweetsSeed)
 	} catch(e) {
@@ -9,7 +11,7 @@ const clearAndSeedDatabase = async collection => {
 	}
 }
 
-const clearDataBase = async collection => {
+const clearTweetCollection = async collection => {
 	try {
 		await collection.collection.drop()
 	} catch(e) {
@@ -18,6 +20,6 @@ const clearDataBase = async collection => {
 }
 
 module.exports = {
-	clearAndSeedDatabase,
-	clearDataBase
+	clearAndSeedTweetCollection,
+	clearTweetCollection
 }

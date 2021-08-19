@@ -951,3 +951,19 @@ I would think the same applies for `findByIdAndDelete` vs `findByIdAndRemove`.
 
 
 
+Users Collection
+Tweets Collection
+Comments Collection
+
+A user can have many tweets
+A user can have many comments
+
+A tweet can have 1 user
+A tweet can have many comments
+
+A comment can have 1 user
+A comment can have 1 tweet
+
+1. create user
+2. create tweet --> need to include user id
+3. create comment --> need to inlcude tweet id and user id
