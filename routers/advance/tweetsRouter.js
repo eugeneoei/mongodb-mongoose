@@ -5,75 +5,6 @@ const User = require('../../models/advance//user')
 
 const router = express.Router()
 
-// // https://docs.mongodb.com/manual/core/aggregation-pipeline/
-// // https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/
-// // https://docs.mongodb.com/manual/reference/operator/aggregation/
-// // https://docs.mongodb.com/manual/reference/operator/aggregation/addFields/
-// router.get('/aggregate', async (req, res) => {
-// 	try {
-
-// 		// const aggregatedResults = await Tweet.aggregate([
-// 		// 	{
-// 		// 		$addFields: {
-// 		// 			netReactions: {
-// 		// 				$subtract: ['$reactions.likes', '$reactions.dislikes']
-// 		// 			},
-// 		// 			secondsSinceCreation: {
-// 		// 				$subtract: [new Date().getTime(), '$createdAt']
-// 		// 			}
-// 		// 		}
-// 		// 	},
-// 		// 	{
-// 		// 		$addFields: {
-// 		// 			daysSinceCreation: {
-// 		// 				// use $function to defined custom aggregation expressions???
-// 		// 				'$divide': ['$secondsSinceCreation', 86400000]
-// 		// 			}
-// 		// 		}
-// 		// 	},
-// 		// 	{
-// 		// 		$addFields: {
-// 		// 			daysSinceCreation: {
-// 		// 				$floor: '$daysSinceCreation'
-// 		// 			}
-// 		// 		}
-// 		// 	}
-// 		// ])
-// 		// res.send(aggregatedResults)
-
-
-// 		const aggregatedResults = await Tweet.aggregate([
-// 			{
-// 				$match: {
-// 					author: 'Steve Rogers'
-// 				}
-// 			},
-// 			{
-// 				$limit: 10
-// 			}
-// 		])
-// 		res.send(aggregatedResults)
-
-
-// 		// const tweets = await Tweet.aggregate([
-// 		// 	{
-// 		// 		$match: {
-// 		// 			'reactions.likes': {
-// 		// 				$gte: 50
-// 		// 			}
-// 		// 		}	
-// 		// 	}
-// 		// ])
-// 		// console.log(tweets.length)
-// 		// res.send(tweets)
-// 	} catch(e) {
-// 		res.status(400).send({
-// 			name: e.name,
-// 			message: e.message
-// 		})
-// 	}
-// })
-
 router.get('', async (req, res) => {
 	try {
 
@@ -123,21 +54,21 @@ router.get('', async (req, res) => {
 		// 	path: 'user',
 		// 	select: 'firstName lastName email'
 		// })
-		// .populate([
-		// 	{
-		// 		path: 'user',
-		// 		select: ['_id', 'email', 'firstName', 'lastName']
-		// 	},
-		// 	{
-		// 		path: 'comments',
-		// 		select: ['body', '_id'],
-		// 		populate: {
-		// 			path: 'user',
-		// 			select: ['_id', 'email', 'firstName', 'lastName']
-		// 		}
-		// 		// sort flag?
-		// 	}
-		// ])
+		.populate([
+			{
+				path: 'user',
+				select: ['_id', 'email', 'firstName', 'lastName']
+			},
+			{
+				path: 'comments',
+				select: ['body', '_id'],
+				populate: {
+					path: 'user',
+					select: ['_id', 'email', 'firstName', 'lastName']
+				}
+				// sort flag?
+			}
+		])
 		res.send(tweets)
 
 	} catch (e) {
@@ -386,101 +317,21 @@ router.post('', async (req, res) => {
 	}
 })
 
-router.patch('/:id/reactions', validateReactions, async (req, res) => {
-	try {
-		const type = req.body.type
-		const action = req.body.action
-		const tweet = await Tweet.findById(req.params.id)
-		const typeCurrentCount = tweet.reactions[type]
-		if (action === 'decrement' && typeCurrentCount < 1) {
-			res.send(tweet)
-		} else {
-			const path = `reactions.${type}`
-			const incrementValue = action === 'increment' ? 1 : -1
-			const updatedTweet = await Tweet.findByIdAndUpdate(
-				req.params.id,
-				{
-					// $inc means increment
-					$inc: {
-						// updating a nested document
-						[path]: incrementValue
-					}
-				},
-				{
-					new: true
-				}
-			)
-			if (updatedTweet) {
-				res.send(updatedTweet)
-			} else {
-				throw new ReferenceError('Tweet you are trying to update does not exist')
-			}
-		}
-	} catch (e) {
-		res.status(400).send({
-			name: e.name,
-			message: e.message
-		})
-	}
-})
-
-router.patch('/:id', async (req, res) => {
-	try {
-		const updatedTweet = await Tweet.findByIdAndUpdate(
-			req.params.id,
-			{
-				title: `${req.body.title} using "findByIdAndUpdate" method using HTTP PATCH`
-			},
-			{
-				new: true
-			}
-		)
-		if (updatedTweet) {
-			res.send(updatedTweet)
-		} else {
-			throw new Error('Tweet you are trying to update does not exist.')
-		}
-	} catch (e) {
-		res.status(400).send({
-			name: e.name,
-			message: e.message
-		})
-	}
-})
-
-
-router.put('/:id', async (req, res) => {
-	try {
-		const updatedTweet = await Tweet.findOneAndReplace(
-			{ _id: req.params.id },
-			req.body,
-			{
-				new: true
-			}
-		)
-		if (updatedTweet) {
-			res.send(updatedTweet)
-		} else {
-			throw new Error('Tweet you are trying to update does not exist.')
-		}
-	} catch (e) {
-		res.status(400).send({
-			name: e.name,
-			message: e.message
-		})
-	}
-})
-
 router.delete('/:id', async (req, res) => {
 	try {
 		// delete comments attached to tweet
 		// delete tweet attached to user
 
-		const deleteResponse = await Tweet.findByIdAndDelete(req.params.id)
+		// there is a "post" hook middleware declared for "findOneAndDelete" in "Tweet" (refer to tweet schema)
+		// ie whenever, "Tweet" model uses the method "findOneAndDelete", this middleware will be executed
+		// note that middlewares can only be used for some methods
+		const deleteResponse = await Tweet.findOneAndDelete({
+			_id: req.params.id
+		})
 		if (deleteResponse) {
-			res.send('Successfully deleted tweet using "findByIdAndDelete" method.')
+			res.send('Successfully deleted tweet.')
 		} else {
-			throw new Error('The tweet you are trying to delete using "findByIdAndDelete" method does not exist.')
+			throw new Error('The tweet you are trying to delete does not exist.')
 		}
 	} catch (e) {
 		res.status(400).send({

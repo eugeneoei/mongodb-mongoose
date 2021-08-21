@@ -6,7 +6,14 @@ const router = express.Router()
 
 router.get('', async (req, res) => {
 	try {
-		res.send(await Comment.find({}))
+		res.send(
+			await Comment.find(
+				{}
+			)
+			.populate({
+				path: 'user'
+			})
+		)
 	} catch(e) {
 		res.status(400).send({
 			name: e.name,
@@ -82,11 +89,12 @@ router.post('', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
 	try {
-		// there is a "post" hook middleware has been declared whenever "findOneAndDelete" is used for comments
-		// refer to comment schema
-		// note that post hook middlewares can only be used for some methods
-		// in this case, "post" hook is not applicable to "findByIdAndDelete" and therefore, "findOneAndDelete" is used
-		const deleteResponse = await Comment.findOneAndDelete({ _id: req.params.id })
+		// there is a "post" hook middleware declared for "findOneAndDelete" in "Comment" (refer to comment schema)
+		// ie whenever, "Comment" model uses the method "findOneAndDelete", this middleware will be executed
+		// note that middlewares can only be used for some methods
+		const deleteResponse = await Comment.findOneAndDelete({
+			_id: req.params.id
+		})
 		if (!deleteResponse) {
 			throw new Error('The comment you are trying to delete does not exist.')
 		}

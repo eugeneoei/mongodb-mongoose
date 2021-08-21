@@ -45,39 +45,13 @@ router.get('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
 	try {
-		// after deleting user,
-		// delete all comments written by this user?
-		// delete all tweets written by this user?
-		await User.findByIdAndDelete(req.params.id)
+		// there is a "post" hook middleware declared for "findOneAndDelete" in "User" (refer to user schema)
+		// ie whenever, "User" model uses the method "findOneAndDelete", this middleware will be executed
+		// note that middlewares can only be used for some methods
+		const deleteResponse = await User.findOneAndDelete({
+			_id: req.params.id
+		})
 		if (deleteResponse) {
-			// if user has been successfully deleted,
-			// delete all tweets and comments by this user
-			// remove userid from tweet's comments array
-			await Tweet.deleteMany({
-				'user._id': {
-					$eq: req.params.id
-				}
-			})
-			// await Tweet.updateMany(
-			// 	{
-			// 		'user._id': {
-			// 			$eq: req.params.id
-			// 		}
-			// 	}
-			// )
-			await Comment.deleteMany({
-				'user._id': {
-					$eq: req.params.id
-				}
-			})
-
-			// {
-			// 	$pull: {
-			// 		'comments._id': {
-			// 			$eq: req.body.tweetId
-			// 		}
-			// 	}
-			// }
 			res.send('Successfully deleted User.')
 		} else {
 			throw new Error('The User you are trying to delete does not exist.')

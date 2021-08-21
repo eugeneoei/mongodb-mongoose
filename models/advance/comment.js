@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
-const { Schema } = mongoose
-
 const tweet = require('./tweet')
+const { Schema } = mongoose
 
 const commentSchema = new Schema(
 	{
@@ -36,7 +35,8 @@ const commentSchema = new Schema(
 )
 
 commentSchema.post('findOneAndDelete', async doc => {
-	// when a comment is deleted, remove comment from tweet's comments array
+	// when a comment is deleted, we need to
+	// 	1. remove comment from tweet's comments array (each comment can only belong to one tweet)
 	try {
 		await tweet.updateOne(
 			{
@@ -46,9 +46,6 @@ commentSchema.post('findOneAndDelete', async doc => {
 				$pull: {
 					comments: doc._id
 				}
-			},
-			{
-				multi: true
 			}
 		)
 	} catch(e) {

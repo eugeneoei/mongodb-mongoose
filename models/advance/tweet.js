@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const comment = require('./comment')
 const { Schema } = mongoose
 
 const tweetSchema = new Schema(
@@ -34,6 +35,20 @@ const tweetSchema = new Schema(
 		timestamps: true
 	}
 )
+
+tweetSchema.post('findOneAndDelete', async doc => {
+	// when a tweet is deleted, we need to
+	// 	1. delete all comments that belongs to this deleted tweet
+	try {
+		await comment.deleteMany(
+			{
+				tweet: doc._id
+			}
+		)
+	} catch(e) {
+		console.log(e)
+	}
+})
 
 const Tweet = mongoose.model('Tweet', tweetSchema) // tweetSchema to be used on Tweet collection
 
