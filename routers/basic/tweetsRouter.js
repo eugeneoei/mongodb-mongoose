@@ -1,8 +1,8 @@
 const express = require('express')
-const Tweet = require('../schemas/tweet')
-const validateReactions = require('../middlewares/validateReactions')
-const utils = require('../utils/tweetUtils')
-const tweetsGenerator = require('../seed/tweetsGenerator')
+const validateReactions = require('../../middlewares/validateReactions')
+const Tweet = require('../..//models/basic/tweet')
+const utils = require('../../utils/basic/tweetUtils')
+// const tweetsGenerator = require('../seed/tweetsGenerator')
 
 const router = express.Router()
 
@@ -18,17 +18,17 @@ router.get('/clear', async (req, res) => {
 	}
 })
 
-router.get('/generate', async (req, res) => {
-	try {
-		await tweetsGenerator.generateRandomTweets()
-		res.send('ok')
-	} catch (e) {
-		res.status(400).send({
-			name: e.name,
-			message: e.message
-		})
-	}
-})
+// router.get('/generate', async (req, res) => {
+// 	try {
+// 		await tweetsGenerator.generateRandomTweets()
+// 		res.send('ok')
+// 	} catch (e) {
+// 		res.status(400).send({
+// 			name: e.name,
+// 			message: e.message
+// 		})
+// 	}
+// })
 
 router.get('/clear-and-seed', async (req, res) => {
 	try {

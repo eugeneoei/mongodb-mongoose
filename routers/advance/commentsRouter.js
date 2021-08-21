@@ -1,24 +1,24 @@
 const express = require('express')
-const Comment = require('../schemas/comment')
-const utils = require('../utils/commentUtils')
+const Comment = require('../../models/advance/comment')
+const Tweet = require('../../models/advance/tweet')
+const User = require('../../models/advance/user')
+// const utils = require('../utils/commentUtils')
 // const commentsGenerator = require('../seed/commentsGenerator')
 // const commentsSeed = require('../seed/commentsSeed')
-const Tweet = require('../schemas/tweet')
-const User = require('../schemas/user')
 
 const router = express.Router()
 
-router.get('/clear', async (req, res) => {
-	try {
-		await utils.clearCommentCollection(Comment)
-		res.send('ok')
-	} catch (e) {
-		res.status(400).send({
-			name: e.name,
-			message: e.message
-		})
-	}
-})
+// router.get('/clear', async (req, res) => {
+// 	try {
+// 		await utils.clearCommentCollection(Comment)
+// 		res.send('ok')
+// 	} catch (e) {
+// 		res.status(400).send({
+// 			name: e.name,
+// 			message: e.message
+// 		})
+// 	}
+// })
 
 // router.get('/generate', async (req, res) => {
 // 	try {
@@ -105,7 +105,14 @@ router.post('', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
 	try {
-		// delete from db and how to delete from tweet's comments array??
+
+		// delete comment from collection and but to delete from tweet's comments array??
+
+		// find comment to delete, populate tweet field to get tweet id
+		// delete comment from Comment collection
+		// delete comment from Tweet collection
+
+		// const commentToDelete = await Comment.findById(req.params.id)
 
 		const deleteResponse = await Comment.findByIdAndDelete(req.params.id)
 		if (!deleteResponse) {
@@ -126,25 +133,25 @@ router.delete('/:id', async (req, res) => {
 			}
 		)
 
-		res.send('ok')
+		res.redirect(`/tweets/${tweetId}`)
 
 
-		// find all the burgers with pickles (or a topping you used more than once) and remove the pickles
-		db.burger.updateMany(
-			{
-				toppings: {
-					$all:
-						['pickles']
-				}
-			},
-			{
-				$pull: {
-					toppings: {
-						$in: ['pickles']
-					}
-				}
-			}
-		)
+		// // find all the burgers with pickles (or a topping you used more than once) and remove the pickles
+		// db.burger.updateMany(
+		// 	{
+		// 		toppings: {
+		// 			$all:
+		// 				['pickles']
+		// 		}
+		// 	},
+		// 	{
+		// 		$pull: {
+		// 			toppings: {
+		// 				$in: ['pickles']
+		// 			}
+		// 		}
+		// 	}
+		// )
 
 	} catch(e) {
 		res.status(400).send({

@@ -1,0 +1,102 @@
+[
+	{
+		"firstName": "Tony",
+		"lastName": "Stark",
+		"email": "tony.stark@email.com"
+	},
+	{
+		"firstName": "Peter",
+		"lastName": "Parker",
+		"email": "peter.parker@email.com"
+	},
+	{
+		"firstName": "Natasha",
+		"lastName": "Romanoff",
+		"email": "natasha.romanoff@email.com"
+	},
+	{
+		"firstName": "Steve",
+		"lastName": "Rogers",
+		"email": "steve.rogers@email.com"
+	},
+	{
+		"firstName": "Clint",
+		"lastName": "Barton",
+		"email": "clint.barton@email.com"
+	},
+	{
+		"firstName": "Bruce",
+		"lastName": "Banner",
+		"email": "bruce.banner@email.com"
+	},
+	{
+		"firstName": "Thor",
+		"lastName": "Odinson",
+		"email": "thor.odinson@email.com"
+	},
+	{
+		"firstName": "Loki",
+		"lastName": "Odinson",
+		"email": "loki.odinson@email.com"
+	},
+	{
+		"firstName": "Thanos",
+		"lastName": "Titan",
+		"email": "thanos.titan@email.com"
+	},
+	{
+		"firstName": "Vision",
+		"lastName": "V",
+		"email": "vision.v@email.com"
+	},
+	{
+		"firstName": "Wanda",
+		"lastName": "Maximoff",
+		"email": "wanda.maximoff@email.com"
+	},
+	{
+		"firstName": "Nick",
+		"lastName": "Fury",
+		"email": "nick.fury@email.com"
+	},
+	{
+		"firstName": "Pepper",
+		"lastName": "Potts",
+		"email": "pepper.potts@email.com"
+	},
+	{
+		"firstName": "Black",
+		"lastName": "Panther",
+		"email": "black.panther@email.com"
+	},
+	{
+		"firstName": "Sam",
+		"lastName": "Wilson",
+		"email": "sam.wilson@email.com"
+	},
+	{
+		"firstName": "James",
+		"lastName": "Rhodes",
+		"email": "james.rhodes@email.com"
+	},
+	{
+		"firstName": "Mary",
+		"lastName": "Jane",
+		"email": "mary.jane@email.com"
+	},
+	{
+		"firstName": "Scott",
+		"lastName": "Lang",
+		"email": "scott.lang@email.com"
+	},
+	{
+		"firstName": "Bucky",
+		"lastName": "Barnes",
+		"email": "bucky.barnes@email.com"
+	},
+	{
+		"firstName": "Hope",
+		"lastName": "Pym",
+		"email": "hope.pym@email.com"
+	}
+]

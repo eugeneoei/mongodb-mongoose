@@ -19,11 +19,13 @@ const commentSchema = new Schema(
 		},
 		user: {
 			type: Schema.Types.ObjectId,
-			ref: 'User'
+			ref: 'User',
+			required: true
 		},
 		tweet: {
 			type: Schema.Types.ObjectId,
-			ref: 'Tweet' // name of related collection
+			ref: 'Tweet', // name of related collection
+			required: true
 		}
 	},
 	{
@@ -40,3 +42,10 @@ module.exports = Comment
 // 	"userId": "",
 // 	"tweetId": ""
 // }
+
+// body: {
+// 	type: String,
+// 	required: true
+// }
+
+

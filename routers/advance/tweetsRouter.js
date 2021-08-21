@@ -1,47 +1,9 @@
 const express = require('express')
-const Tweet = require('../schemas/tweet')
-const tweetsGenerator = require('../seed/tweetsGenerator')
-const User = require('../schemas/user')
-const validateReactions = require('../middlewares/validateReactions')
-const utils = require('../utils/tweetUtils')
+const validateReactions = require('../../middlewares/validateReactions')
+const Tweet = require('../../models/advance/tweet')
+const User = require('../../models/advance//user')
 
 const router = express.Router()
-
-router.get('/clear', async (req, res) => {
-	try {
-		await utils.clearTweetCollection(Tweet)
-		res.send('ok')
-	} catch (e) {
-		res.status(400).send({
-			name: e.name,
-			message: e.message
-		})
-	}
-})
-
-router.get('/generate', async (req, res) => {
-	try {
-		await tweetsGenerator.generateRandomTweets()
-		res.send('ok')
-	} catch (e) {
-		res.status(400).send({
-			name: e.name,
-			message: e.message
-		})
-	}
-})
-
-router.get('/clear-and-seed', async (req, res) => {
-	try {
-		await utils.clearAndSeedTweetCollection(Tweet)
-		res.send('ok')
-	} catch (e) {
-		res.status(400).send({
-			name: e.name,
-			message: e.message
-		})
-	}
-})
 
 // // https://docs.mongodb.com/manual/core/aggregation-pipeline/
 // // https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/
@@ -124,7 +86,7 @@ router.get('', async (req, res) => {
 		// )
 		// .populate({
 		// 	path: 'comments',
-		// 	// perDocumentLimit: 3, // <-- limits number of ref results
+		// 	// perDocumentLimit: 3, // <-- limits number of ref results. not safe because of subsequent documents' ref results are inaccurate (refer to https://mongoosejs.com/docs/populate.html#limit-vs-perDocumentLimit)
 		// 	// limit: 2,
 		// 	// match: {
 		// 	// 	author: {
@@ -150,18 +112,15 @@ router.get('', async (req, res) => {
 		// // .select('title').populate('author')
 		// res.send(tweets)
 
-
+		// Requirement 1
+		// show all tweets with populated user information for each tweet
 		const tweets = await Tweet.find(
 			{}
 		)
-		.populate([
-			{
-				path: 'user'
-			},
-			{
-				path: 'user.tweets'
-			}
-		])
+		.populate({
+			path: 'user',
+			select: 'firstName lastName email'
+		})
 		res.send(tweets)
 
 	} catch (e) {
@@ -182,36 +141,132 @@ router.get('/:id', async (req, res) => {
 		// 	res.status(404).send('Tweet not found')
 		// }
 
+		// // Requirement 1 - populate 1 ref field
+		// // populate user ref who created tweet
+		// const tweet = await Tweet.findById(
+		// 	req.params.id
+		// )
+		// .populate({
+		// 	path: 'user',
+		// 	select: ['_id', 'email', 'firstName', 'lastName']
+		// })
+		// res.send(tweet)
+
+		// Requirement 2 - populate multiple ref fields
+		// populate user ref who created tweet
+		// populate comment ref and user who create each individual comment
 		const tweet = await Tweet.findById(
 			req.params.id
 		)
-		// .populate(
-		// 	{
-		// 		path: 'user',
-		// 		select: ['firstName', 'lastName', '_id']
-		// 	}
-		// )
-		// .populate(
-		// 	{
-		// 		path: 'comments',
-		// 		select: ['body', '_id']
-		// 	}
-		// )
 		.populate([
 			{
 				path: 'user',
-				select: ['firstName', 'lastName', '_id']
+				select: ['_id', 'email', 'firstName', 'lastName']
 			},
 			{
 				path: 'comments',
 				select: ['body', '_id'],
 				populate: {
 					path: 'user',
-					select: ['firstName', 'lastName', '_id']
+					select: ['_id', 'email', 'firstName', 'lastName']
 				}
+				// sort flag?
 			}
 		])
 		res.send(tweet)
+
+
+		// // Requirement 3 - populate multiple ref fields and pagination
+		// // populate user ref who created tweet
+		// // populate comment ref and user who create each individual comment
+		// // paginate tweet's comments : Show page 1 comments and 5 tweets per page
+		// const page = 1
+		// const resultsPerPage = 5
+		// const tweet = await Tweet.findById(
+		// 	req.params.id
+		// )
+		// .populate([
+		// 	{
+		// 		path: 'user',
+		// 		select: ['_id', 'email', 'firstName', 'lastName']
+		// 	},
+		// 	{
+		// 		path: 'comments',
+		// 		select: ['body', '_id'],
+		// 		populate: {
+		// 			path: 'user',
+		// 			select: ['_id', 'email', 'firstName', 'lastName']
+		// 		},
+		// 		options: {
+		// 			// "skip" and "limit" in options to paginate ref documents
+		// 			skip: resultsPerPage * (page - 1),
+		// 			limit: resultsPerPage
+		// 		}
+		// 	}
+		// ])
+		// res.send(tweet)
+
+
+		// // Requirement 4
+		// // populate user who created tweet
+		// // view only comments by user whose email is "tony.stark@avengers.com"
+		// const tweet = await Tweet.findById(
+		// 	req.params.id
+		// )
+		// .populate([
+		// 	{
+		// 		path: 'user',
+		// 		select: ['_id', 'email', 'firstName', 'lastName']
+		// 	},
+		// 	{
+		// 		path: 'comments',
+		// 		select: ['_id', 'body'], // or '_id body'
+		// 		populate: {
+		// 			path: 'user',
+		// 			// if match fails, populated "user" field returns null.
+		// 			// likely not a good way to filter ref documents?
+		// 			match: {
+		// 				'email': {
+		// 					$eq: 'tony.stark@avengers.com'
+		// 				}
+		// 			},
+		// 			select: ['_id', 'email', 'firstName', 'lastName'],
+		// 		}
+		// 	}
+		// ])
+		// res.send(tweet)
+
+
+		// // Requirement 5
+		// // populate user who created tweet
+		// // view only comments by users whose emails are "steve.rogers@avengers.com" or "black.panther@avengers.com"
+		// const tweet = await Tweet.findById(
+		// 	req.params.id
+		// )
+		// .populate([
+		// 	{
+		// 		path: 'user',
+		// 		select: ['_id', 'email', 'firstName', 'lastName']
+		// 	},
+		// 	{
+		// 		path: 'comments',
+		// 		select: ['_id', 'body'], // or '_id body'
+		// 		populate: {
+		// 			path: 'user',
+		// 			// similarly, if match fails, field will return null
+		// 			match: {
+		// 				email: {
+		// 					$in: [
+		// 						'steve.rogers@avengers.com',
+		// 						'black.panther@avengers.com'
+		// 					]
+		// 				}
+		// 			},
+		// 			select: '_id email firstName lastName'
+		// 		}
+		// 	}
+		// ])
+		// res.send(tweet)
 
 
 		// // https://mongoosejs.com/docs/api/model.html#model_Model.populate
@@ -354,11 +409,10 @@ router.patch('/:id/reactions', validateReactions, async (req, res) => {
 
 router.patch('/:id', async (req, res) => {
 	try {
-		// METHOD 1
-		const updatedTweet = await Tweet.findOneAndUpdate(
-			{ _id: req.params.id },
+		const updatedTweet = await Tweet.findByIdAndUpdate(
+			req.params.id,
 			{
-				title: `${req.body.title} using "findOneAndUpdate" method using HTTP PATCH`
+				title: `${req.body.title} using "findByIdAndUpdate" method using HTTP PATCH`
 			},
 			{
 				new: true
@@ -369,36 +423,6 @@ router.patch('/:id', async (req, res) => {
 		} else {
 			throw new Error('Tweet you are trying to update does not exist.')
 		}
-
-		// // METHOD 2
-		// const updatedTweet = await Tweet.findByIdAndUpdate(
-		// 	req.params.id,
-		// 	{
-		// 		title: `${req.body.title} using "findByIdAndUpdate" method using HTTP PATCH`
-		// 	},
-		// 	{
-		// 		new: true
-		// 	}
-		// )
-		// if (updatedTweet) {
-		// 	res.send(updatedTweet)
-		// } else {
-		// 	throw new Error('Tweet you are trying to update does not exist.')
-		// }
-
-		// // METHOD 3
-		// const updatedTweet = await Tweet.updateOne(
-		// 	{ _id: req.params.id },
-		// 	{
-		// 		title: `${req.body.title} using "updateOne" method using HTTP PATCH`
-		// 	}
-		// )
-		// if (updatedTweet.nModified === 1) {
-		// 	res.send('Tweet updated using "updateOne" method using HTTP PATCH')
-		// } else {
-		// 	throw new Error('Tweet you are trying to update does not exist.')
-		// }
-
 	} catch (e) {
 		res.status(400).send({
 			name: e.name,
@@ -410,7 +434,6 @@ router.patch('/:id', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
 	try {
-		// METHOD 1
 		const updatedTweet = await Tweet.findOneAndReplace(
 			{ _id: req.params.id },
 			req.body,
@@ -423,18 +446,6 @@ router.put('/:id', async (req, res) => {
 		} else {
 			throw new Error('Tweet you are trying to update does not exist.')
 		}
-
-		// // METHOD 2
-		// const updatedTweet = await Tweet.replaceOne(
-		// 	{ _id: req.params.id },
-		// 	req.body
-		// )
-		// if (updatedTweet.nModified === 1) {
-		// 	res.send('Tweet updated using "replaceOne" method using HTTP PUT')
-		// } else {
-		// 	throw new Error('Tweet you are trying to update does not exist.')
-		// }
-
 	} catch (e) {
 		res.status(400).send({
 			name: e.name,
@@ -445,55 +456,15 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
 	try {
-		
-		// // METHOD 1
-		// const deleteResponse = await Tweet.deleteOne({
-		// 	_id: req.params.id
-		// })
-		// console.log(deleteResponse)
-		// if (deleteResponse.deletedCount === 1) {
-		// 	res.send('Successfully deleted tweet using "deleteOne" method.')
-		// } else {
-		// 	throw new Error('The tweet you are trying to delete using "deleteOne" method does not exist.')
-		// }
+		// delete comments attached to tweet
+		// delete tweet attached to user
 
-		// // METHOD 2
-		// const deleteResponse = await Tweet.findOneAndDelete({
-		// 	_id: req.params.id
-		// })
-		// if (deleteResponse) {
-		// 	res.send('Successfully deleted tweet using "findOneAndDelete" method.')
-		// } else {
-		// 	throw new Error('The tweet you are trying to delete using "findOneAndDelete" method does not exist.')
-		// }
-
-		// METHOD 3
 		const deleteResponse = await Tweet.findByIdAndDelete(req.params.id)
-		console.log(deleteResponse)
 		if (deleteResponse) {
 			res.send('Successfully deleted tweet using "findByIdAndDelete" method.')
 		} else {
 			throw new Error('The tweet you are trying to delete using "findByIdAndDelete" method does not exist.')
 		}
-
-		// // METHOD 4
-		// const deleteResponse = await Tweet.findOneAndRemove({
-		// 	_id: req.params.id
-		// })
-		// if (deleteResponse) {
-		// 	res.send('Successfully deleted tweet using "findOneAndRemove" method.')
-		// } else {
-		// 	throw new Error('The tweet you are trying to delete using "findOneAndRemove" method does not exist.'
-		// }
-
-		// // METHOD 5
-		// const deleteResponse = await Tweet.findByIdAndRemove(req.params.id)
-		// if (deleteResponse) {
-		// 	res.send('Successfully deleted tweet using "findByIdAndRemove" method.')
-		// } else {
-		// 	throw new Error('The tweet you are trying to delete using "findByIdAndRemove" method does not exist.'
-		// }
-
 	} catch (e) {
 		res.status(400).send({
 			name: e.name,

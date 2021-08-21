@@ -7,7 +7,7 @@ const authors = [
 	'Black Widow',
 	'Steve Rogers',
 	'Hawkeye',
-	'Dr. Banner',
+	'Bruce Banner',
 	'Thor',
 	'Thanos',
 	'Vision',

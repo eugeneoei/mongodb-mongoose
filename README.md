@@ -955,14 +955,18 @@ Users Collection
 Tweets Collection
 Comments Collection
 
-A user can have many tweets
-A user can have many comments
+A user can have many tweets --> tweet to have user id
+A user can have many comments --> comment to have user id
+When a user is deleted --> delete tweets that have user id, delete comments that have user id
 
-A tweet can have 1 user
-A tweet can have many comments
+A tweet can have 1 user --> tweet to have user id
+A tweet can have many comments --> comments to have tweet id
+When a tweet is deleted --> delete comments that have tweet id
 
-A comment can have 1 user
-A comment can have 1 tweet
+
+
+
+A comment can have 1 tweet --> comment to have tweet id
 
 1. create user
 2. create tweet --> need to include user id

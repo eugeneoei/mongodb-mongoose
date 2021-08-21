@@ -1,5 +1,5 @@
 const express = require('express')
-const User = require('../schemas/user')
+const User = require('../../models/advance/user')
 const router = express.Router()
 
 router.get('', async (req, res) => {
@@ -28,6 +28,7 @@ router.post('', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
 	try {
+		// populate tweets by user
 		const user = await User.findById(req.params.id)
 		if (user) {
 			res.send(user)
@@ -44,6 +45,9 @@ router.get('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
 	try {
+		// after deleting user,
+		// delete all comments written by this user?
+		// delete all tweets written by this user?
 		const deleteResponse = await User.findByIdAndDelete(req.params.id)
 		if (deleteResponse) {
 			res.send('Successfully deleted User.')
