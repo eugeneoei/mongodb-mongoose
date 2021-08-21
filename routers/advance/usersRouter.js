@@ -48,8 +48,36 @@ router.delete('/:id', async (req, res) => {
 		// after deleting user,
 		// delete all comments written by this user?
 		// delete all tweets written by this user?
-		const deleteResponse = await User.findByIdAndDelete(req.params.id)
+		await User.findByIdAndDelete(req.params.id)
 		if (deleteResponse) {
+			// if user has been successfully deleted,
+			// delete all tweets and comments by this user
+			// remove userid from tweet's comments array
+			await Tweet.deleteMany({
+				'user._id': {
+					$eq: req.params.id
+				}
+			})
+			// await Tweet.updateMany(
+			// 	{
+			// 		'user._id': {
+			// 			$eq: req.params.id
+			// 		}
+			// 	}
+			// )
+			await Comment.deleteMany({
+				'user._id': {
+					$eq: req.params.id
+				}
+			})
+
+			// {
+			// 	$pull: {
+			// 		'comments._id': {
+			// 			$eq: req.body.tweetId
+			// 		}
+			// 	}
+			// }
 			res.send('Successfully deleted User.')
 		} else {
 			throw new Error('The User you are trying to delete does not exist.')

@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
 
+const tweet = require('./tweet')
+
 const commentSchema = new Schema(
 	{
 		body: {
@@ -33,19 +35,27 @@ const commentSchema = new Schema(
 	}
 )
 
+commentSchema.post('findOneAndDelete', async doc => {
+	// when a comment is deleted, remove comment from tweet's comments array
+	try {
+		await tweet.updateOne(
+			{
+				comments: doc._id
+			},
+			{
+				$pull: {
+					comments: doc._id
+				}
+			},
+			{
+				multi: true
+			}
+		)
+	} catch(e) {
+		console.log(e)
+	}
+})
+
 const Comment = mongoose.model('Comment', commentSchema)
 
 module.exports = Comment
-
-// {
-// 	"body": "",
-// 	"userId": "",
-// 	"tweetId": ""
-// }
-
-// body: {
-// 	type: String,
-// 	required: true
-// }
-
-

@@ -2,51 +2,28 @@ const express = require('express')
 const Comment = require('../../models/advance/comment')
 const Tweet = require('../../models/advance/tweet')
 const User = require('../../models/advance/user')
-// const utils = require('../utils/commentUtils')
-// const commentsGenerator = require('../seed/commentsGenerator')
-// const commentsSeed = require('../seed/commentsSeed')
-
 const router = express.Router()
-
-// router.get('/clear', async (req, res) => {
-// 	try {
-// 		await utils.clearCommentCollection(Comment)
-// 		res.send('ok')
-// 	} catch (e) {
-// 		res.status(400).send({
-// 			name: e.name,
-// 			message: e.message
-// 		})
-// 	}
-// })
-
-// router.get('/generate', async (req, res) => {
-// 	try {
-// 		await commentsGenerator.generateRandomTweets()
-// 		res.send('ok')
-// 	} catch (e) {
-// 		res.status(400).send({
-// 			name: e.name,
-// 			message: e.message
-// 		})
-// 	}
-// })
-
-// router.get('/clear-and-seed', async (req, res) => {
-// 	try {
-// 		await utils.clearAndSeedCollection(Comment, commentsSeed)
-// 		res.send('ok')
-// 	} catch (e) {
-// 		res.status(400).send({
-// 			name: e.name,
-// 			message: e.message
-// 		})
-// 	}
-// })
 
 router.get('', async (req, res) => {
 	try {
 		res.send(await Comment.find({}))
+	} catch(e) {
+		res.status(400).send({
+			name: e.name,
+			message: e.message
+		})
+	}
+})
+
+router.get('/:id', async (req, res) => {
+	try {
+		// res.send(await Comment.find({}))
+		const comment = await Comment.findById(req.params.id)
+		if (comment) {
+			res.send(comment)
+		} else {
+			res.status(404).send('Comment not found')
+		}
 	} catch(e) {
 		res.status(400).send({
 			name: e.name,
@@ -105,53 +82,15 @@ router.post('', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
 	try {
-
-		// delete comment from collection and but to delete from tweet's comments array??
-
-		// find comment to delete, populate tweet field to get tweet id
-		// delete comment from Comment collection
-		// delete comment from Tweet collection
-
-		// const commentToDelete = await Comment.findById(req.params.id)
-
-		const deleteResponse = await Comment.findByIdAndDelete(req.params.id)
+		// there is a "post" hook middleware has been declared whenever "findOneAndDelete" is used for comments
+		// refer to comment schema
+		// note that post hook middlewares can only be used for some methods
+		// in this case, "post" hook is not applicable to "findByIdAndDelete" and therefore, "findOneAndDelete" is used
+		const deleteResponse = await Comment.findOneAndDelete({ _id: req.params.id })
 		if (!deleteResponse) {
 			throw new Error('The comment you are trying to delete does not exist.')
 		}
-
-		const updatedTweet = await Tweet.findByIdAndUpdate(
-			req.body.tweetId,
-			{
-				$pull: {
-					'comments._id': {
-						$eq: req.body.tweetId
-					}
-				}
-			},
-			{
-				new: true
-			}
-		)
-
-		res.redirect(`/tweets/${tweetId}`)
-
-
-		// // find all the burgers with pickles (or a topping you used more than once) and remove the pickles
-		// db.burger.updateMany(
-		// 	{
-		// 		toppings: {
-		// 			$all:
-		// 				['pickles']
-		// 		}
-		// 	},
-		// 	{
-		// 		$pull: {
-		// 			toppings: {
-		// 				$in: ['pickles']
-		// 			}
-		// 		}
-		// 	}
-		// )
+		res.send('ok')
 
 	} catch(e) {
 		res.status(400).send({
