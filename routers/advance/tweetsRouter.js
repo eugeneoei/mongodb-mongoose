@@ -46,29 +46,12 @@ router.get('', async (req, res) => {
 		// // Requirement 1
 		// show all tweets with populated user information for each tweet
 		const tweets = await Tweet.find(
-			{
-			// 	comments: '6121f46362153826bb31dca9'
-			}
+			{}
 		)
-		// .populate({
-		// 	path: 'user',
-		// 	select: 'firstName lastName email'
-		// })
-		// .populate([
-		// 	// {
-		// 	// 	path: 'user',
-		// 	// 	select: ['_id', 'email', 'firstName', 'lastName']
-		// 	// },
-		// 	{
-		// 		path: 'comments',
-		// 		select: ['body', '_id'],
-		// 		populate: {
-		// 			path: 'user',
-		// 			select: ['_id', 'email', 'firstName', 'lastName']
-		// 		}
-		// 		// sort flag?
-		// 	}
-		// ])
+		.populate({
+			path: 'user',
+			select: 'firstName lastName email'
+		})
 		res.send(tweets)
 
 		// const tweets = await Tweet.find(

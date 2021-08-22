@@ -10,9 +10,9 @@ router.get('', async (req, res) => {
 			await Comment.find(
 				{}
 			)
-			// .populate({
-			// 	path: 'user'
-			// })
+			.populate({
+				path: 'user'
+			})
 		)
 	} catch(e) {
 		res.status(400).send({
@@ -38,28 +38,17 @@ router.get('/:id', async (req, res) => {
 	}
 })
 
-// NOTE:
-// should be able to use a "post" hook middleware for "save" method in "Comment" to update tweet document's comments field.
-// but somehow, hook is not working. for now, using conventional approach
-// to revisit.
 router.post('', async (req, res) => {
 	try {
+		// there is a "post" hook middleware declared for "save" in "Comment" (refer to comment schema) to update tweet document's comments field.
+		// ie whenever, "Comment" model uses the method "save", this middleware will be executed
+		// note that "create()" triggers the middleware for "save()"
 		const { userId, tweetId, body } = req.body
-		// when a comment is created, we need to
-		// 	1. push comment to tweet's comments array
 		const newComment = await Comment.create({
 			body,
 			user: userId,
 			tweet: tweetId
 		})
-		await Tweet.findByIdAndUpdate(
-			tweetId,
-			{
-				$push : {
-					comments: newComment._id
-				}
-			}
-		)
 		res.redirect(`/tweets/${tweetId}`)
 	} catch(e) {
 		res.status(400).send({
@@ -83,7 +72,6 @@ router.delete('/:id', async (req, res) => {
 		} else {
 			throw new Error('The Comment you are trying to delete does not exist.')
 		}
-
 	} catch(e) {
 		res.status(400).send({
 			name: e.name,

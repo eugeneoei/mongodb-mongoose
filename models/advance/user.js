@@ -1,6 +1,4 @@
 const mongoose = require('mongoose')
-const Tweet = require('./tweet')
-const Comment = require('./comment')
 const { Schema } = mongoose
 
 const userSchema = new Schema(
@@ -31,21 +29,20 @@ userSchema.post('findOneAndDelete', async doc => {
 	// 	2. delete all comments by deleted user
 	// 	3. remove all comments made by user in ALL tweets
 	try {
-		const commentsBelongingToDeletedUser = await Comment.find({
+		const commentsBelongingToDeletedUser = await mongoose.model('Comment').find({
 			user: doc._id
 		})
-		await Tweet.deleteMany(
+		await mongoose.model('Tweet').deleteMany(
 			{
 				user: doc._id
 			}
 		)
-		
-		await Comment.deleteMany(
+		await mongoose.model('Comment').deleteMany(
 			{
 				user: doc._id
 			}
 		)
-		await Tweet.updateMany(
+		await mongoose.model('Tweet').updateMany(
 			{},
 			{
 				$pull: {
