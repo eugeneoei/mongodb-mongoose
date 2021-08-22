@@ -30,7 +30,6 @@ router.post('', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
 	try {
-		// populate tweets by user
 		const user = await User.findById(req.params.id)
 		if (user) {
 			res.send(user)

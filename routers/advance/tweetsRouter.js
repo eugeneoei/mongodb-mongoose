@@ -8,162 +8,41 @@ const router = express.Router()
 router.get('', async (req, res) => {
 	try {
 
-		// // https://mongoosejs.com/docs/api/model.html#model_Model.populate
-		// const page = 1
-		// const resultsPerPage = 2
-		// const tweets = await Tweet.find(
-		// 	{},
-		// 	'title'
-		// )
-		// .populate({
-		// 	path: 'comments',
-		// 	// perDocumentLimit: 3, // <-- limits number of ref results. not safe because of subsequent documents' ref results are inaccurate (refer to https://mongoosejs.com/docs/populate.html#limit-vs-perDocumentLimit)
-		// 	// limit: 2,
-		// 	// match: {
-		// 	// 	author: {
-		// 	// 		$eq: 'This is a comment author 2'
-		// 	// 	}
-		// 	// },
-		// 	select: ['author', 'body'],
-		// 	// // transform is like map
-		// 	// transform: comment => {
-		// 	// 	console.log(comment)
-		// 	// 	return comment
-		// 	// 	// return {
-		// 	// 	// 	...comment,
-		// 	// 	// 	body: `${comment.body} transformed`
-		// 	// 	// }
-		// 	// }
-		// 	// options: {
-		// 	// 	skip: resultsPerPage * (page - 1),
-		// 	// 	limit: resultsPerPage
-		// 	// }
-		// })
-		// .limit(2) // <-- limits number of tweets 
-		// // .select('title').populate('author')
-		// res.send(tweets)
-
-		// // Requirement 1
-		// show all tweets with populated user information for each tweet
+		// Requirement 1 - populate multiple ref fields and pagination
+		// populate user ref who created tweet
+		// populate comment ref and user who create each individual comment
+		// paginate tweet's comments : Show page 1 comments and 5 tweets per page
+		const page = 1
+		const resultsPerPage = 5
 		const tweets = await Tweet.find(
 			{}
 		)
-		.populate({
-			path: 'user',
-			select: 'firstName lastName email'
-		})
+		.populate([
+			{
+				path: 'user',
+				select: ['_id', 'email', 'firstName', 'lastName']
+			},
+			{
+				path: 'comments',
+				select: ['_id', 'body'], // or '_id body'
+				populate: {
+					path: 'user',
+					select: ['_id', 'email', 'firstName', 'lastName']
+				},
+				options: {
+					// "skip" and "limit" in options to paginate ref documents
+					skip: resultsPerPage * (page - 1),
+					limit: resultsPerPage
+				}
+			}
+		])
 		res.send(tweets)
 
-		// const tweets = await Tweet.find(
-		// 	{
-		// 		comments: '6121f46362153826bb31dca9'
-		// 	}
-		// )
-		// .populate([
-		// 	// {
-		// 	// 	path: 'user',
-		// 	// 	select: ['_id', 'email', 'firstName', 'lastName']
-		// 	// },
-		// 	{
-		// 		path: 'comments',
-		// 		select: ['body', '_id'],
-		// 		populate: {
-		// 			path: 'user',
-		// 			select: ['_id', 'email', 'firstName', 'lastName']
-		// 		}
-		// 		// sort flag?
-		// 	}
-		// ])
-		// console.log(tweets.length)
-		// res.send(tweets)
-
-	} catch (e) {
-		res.status(400).send({
-			name: e.name,
-			message: e.message
-		})
-	}
-})
-
-router.get('/:id', async (req, res) => {
-	try {
-		// const tweet = await Tweet.findById(req.params.id)
-		// if (tweet) {
-		// 	res.send(tweet)
-		// } else {
-		// 	res.status(404).send('Tweet not found')
-		// }
-
-		// Requirement 1 - populate 1 ref field
-		// populate user ref who created tweet
-		const tweet = await Tweet.findById(
-			req.params.id
-		)
-		.populate({
-			path: 'user',
-			select: ['_id', 'email', 'firstName', 'lastName']
-		})
-		res.send(tweet)
-
-		// // Requirement 2 - populate multiple ref fields
-		// // populate user ref who created tweet
-		// // populate comment ref and user who create each individual comment
-		// const tweet = await Tweet.findById(
-		// 	req.params.id
-		// )
-		// .populate([
-		// 	{
-		// 		path: 'user',
-		// 		select: ['_id', 'email', 'firstName', 'lastName']
-		// 	},
-		// 	{
-		// 		path: 'comments',
-		// 		select: ['body', '_id'],
-		// 		populate: {
-		// 			path: 'user',
-		// 			select: ['_id', 'email', 'firstName', 'lastName']
-		// 		}
-		// 	}
-		// ])
-		// res.send(tweet)
-
-
-		// // Requirement 3 - populate multiple ref fields and pagination
-		// // populate user ref who created tweet
-		// // populate comment ref and user who create each individual comment
-		// // paginate tweet's comments : Show page 1 comments and 5 tweets per page
-		// const page = 1
-		// const resultsPerPage = 5
-		// const tweet = await Tweet.findById(
-		// 	req.params.id
-		// )
-		// .populate([
-		// 	{
-		// 		path: 'user',
-		// 		select: ['_id', 'email', 'firstName', 'lastName']
-		// 	},
-		// 	{
-		// 		path: 'comments',
-		// 		select: ['body', '_id'],
-		// 		populate: {
-		// 			path: 'user',
-		// 			select: ['_id', 'email', 'firstName', 'lastName']
-		// 		},
-		// 		options: {
-		// 			// "skip" and "limit" in options to paginate ref documents
-		// 			skip: resultsPerPage * (page - 1),
-		// 			limit: resultsPerPage
-		// 		}
-		// 	}
-		// ])
-		// res.send(tweet)
-
-
-		// // Requirement 4
+		// // Requirement 2
 		// // populate user who created tweet
-		// // view only comments by user whose email is "tony.stark@avengers.com"
-		// const tweet = await Tweet.findById(
-		// 	req.params.id
+		// // view only comments by user whose email is "thanos.titan@email.com"
+		// const tweets = await Tweet.find(
+		// 	{}
 		// )
 		// .populate([
 		// 	{
@@ -179,21 +58,20 @@ router.get('/:id', async (req, res) => {
 		// 			// likely not a good way to filter ref documents?
 		// 			match: {
 		// 				'email': {
-		// 					$eq: 'tony.stark@avengers.com'
+		// 					$eq: 'thanos.titan@email.com'
 		// 				}
 		// 			},
 		// 			select: ['_id', 'email', 'firstName', 'lastName'],
 		// 		}
 		// 	}
 		// ])
-		// res.send(tweet)
+		// res.send(tweets)
 
-
-		// // Requirement 5
+		// // Requirement 3
 		// // populate user who created tweet
-		// // view only comments by users whose emails are "steve.rogers@avengers.com" or "black.panther@avengers.com"
-		// const tweet = await Tweet.findById(
-		// 	req.params.id
+		// // view only comments by users whose emails are "steve.rogers@email.com" or "black.panther@email.com"
+		// const tweets = await Tweet.find(
+		// 	{}
 		// )
 		// .populate([
 		// 	{
@@ -209,8 +87,8 @@ router.get('/:id', async (req, res) => {
 		// 			match: {
 		// 				email: {
 		// 					$in: [
-		// 						'steve.rogers@avengers.com',
-		// 						'black.panther@avengers.com'
+		// 						'steve.rogers@email.com',
+		// 						'black.panther@email.com'
 		// 					]
 		// 				}
 		// 			},
@@ -218,75 +96,51 @@ router.get('/:id', async (req, res) => {
 		// 		}
 		// 	}
 		// ])
-		// res.send(tweet)
+		// res.send(tweets)
 
-		// const tweet = Tweet.findOne(
-		// 	{
-		// 		comments: '6121cc181851fa25add43391'
-		// 	}
-		// )
-		// res.send(tweet)
+	} catch (e) {
+		res.status(400).send({
+			name: e.name,
+			message: e.message
+		})
+	}
+})
 
+router.get('/:id', async (req, res) => {
+	try {
 
-		// // https://mongoosejs.com/docs/api/model.html#model_Model.populate
-		// const page = 2
-		// const resultsPerPage = 2
+		// Requirement 1
+		// show tweet with populated user information for each tweet
+		const tweet = await Tweet.findById(
+			req.params.id
+		)
+		.populate({
+			path: 'user',
+			select: 'firstName lastName email'
+		})
+		res.send(tweet)
+
+		// // Requirement 2
+		// // show tweet with populated user and comments ref
+		// // notice requirement 1 is an object but requirement 2 is an array
 		// const tweet = await Tweet.findById(
-		// 	req.params.id,
-		// 	'title'
+		// 	req.params.id
 		// )
-		// .populate({
-		// 	path: 'comments',
-		// 	// // "perDocumentLimit" limits number of ref documents. doesnt allow for pagination
-		// 	// perDocumentLimit: resultsPerPage,
-
-		// 	// "match" to filter ref documents
-		// 	match: {
-		// 		author: {
-		// 			$eq: 'This is a comment author 2'
-		// 		}
+		// .populate([
+		// 	{
+		// 		path: 'user',
+		// 		select: 'firstName lastName email'
 		// 	},
-
-		// 	select: ['author', 'body'],
-		// 	options: {
-		// 		// "skip" and "limit" in options to paginate ref documents
-		// 		skip: resultsPerPage * (page - 1),
-		// 		limit: resultsPerPage
+		// 	{
+		// 		path: 'comments',
+		// 		select: ['body', '_id'],
+		// 		populate: {
+		// 			path: 'user',
+		// 			select: ['_id', 'email', 'firstName', 'lastName']
+		// 		}
 		// 	}
-		// })
-		// if (tweet) {
-		// 	res.send(tweet)
-		// } else {
-		// 	res.status(404).send('Tweet not found')
-		// }
-		// // .populate({
-		// // 	path: 'comments',
-		// // 	// perDocumentLimit: 3,
-		// // 	// limit: 2,
-		// // 	// match: {
-		// // 	// 	author: {
-		// // 	// 		$eq: 'This is a comment author 2'
-		// // 	// 	}
-		// // 	// },
-		// // 	select: ['author', 'body'],
-		// // 	// // transform is like map
-		// // 	// transform: comment => {
-		// // 	// 	console.log(comment)
-		// // 	// 	return comment
-		// // 	// 	// return {
-		// // 	// 	// 	...comment,
-		// // 	// 	// 	body: `${comment.body} transformed`
-		// // 	// 	// }
-		// // 	// }
-		// // 	options: {
-		// // 		skip: resultsPerPage * (page - 1),
-		// // 		limit: resultsPerPage
-		// // 	}
-		// // })
-		// // .limit(2)
-		// // // .select('title').populate('author')
-		// // res.send(tweets)
-
+		// ])
+		// res.send(tweet)
 
 	} catch (e) {
 		res.status(400).send({
