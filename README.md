@@ -20,6 +20,6 @@ Refer to this [document](/routers/basic/BASIC.md) for a detailed run through of 
 
 **Advance**
 
-For [advance](./routers/basic/BASIC.md), to understand the process of establishing relationships between colections in `mongodb` and the use of `mongoose`'s `hook` middlewares to update or clean up dependent documents caused by a change in another document (removing a user removes all their blogposts).
+For advance, to understand the process of establishing relationships between colections in `mongodb` and the use of `mongoose`'s `hook` middlewares to update or clean up dependent documents caused by a change in another document (removing a user removes all their blogposts).
 
 Refer to this [document](/routers/advance/ADVANCE.md) for a detailed run through of this section.
