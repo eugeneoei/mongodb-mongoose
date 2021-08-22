@@ -8,10 +8,7 @@ const router = express.Router()
 router.get('', async (req, res) => {
 	try {
 
-		// Requirement 1 - populate multiple ref fields and pagination
-		// populate user ref who created tweet
-		// populate comment ref and user who create each individual comment
-		// paginate tweet's comments : Show page 1 comments and 5 tweets per page
+		// Requirement 1
 		const page = 1
 		const resultsPerPage = 5
 		const tweets = await Tweet.find(
@@ -39,8 +36,6 @@ router.get('', async (req, res) => {
 		res.send(tweets)
 
 		// // Requirement 2
-		// // populate user who created tweet
-		// // view only comments by user whose email is "thanos.titan@email.com"
 		// const tweets = await Tweet.find(
 		// 	{}
 		// )
@@ -68,8 +63,6 @@ router.get('', async (req, res) => {
 		// res.send(tweets)
 
 		// // Requirement 3
-		// // populate user who created tweet
-		// // view only comments by users whose emails are "steve.rogers@email.com" or "black.panther@email.com"
 		// const tweets = await Tweet.find(
 		// 	{}
 		// )
@@ -110,7 +103,6 @@ router.get('/:id', async (req, res) => {
 	try {
 
 		// Requirement 1
-		// show tweet with populated user information for each tweet
 		const tweet = await Tweet.findById(
 			req.params.id
 		)
@@ -121,8 +113,6 @@ router.get('/:id', async (req, res) => {
 		res.send(tweet)
 
 		// // Requirement 2
-		// // show tweet with populated user and comments ref
-		// // notice requirement 1 is an object but requirement 2 is an array
 		// const tweet = await Tweet.findById(
 		// 	req.params.id
 		// )

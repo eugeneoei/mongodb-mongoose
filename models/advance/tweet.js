@@ -37,7 +37,7 @@ const tweetSchema = new Schema(
 
 tweetSchema.post('findOneAndDelete', async doc => {
 	// when a tweet is deleted, we need to
-	// 	1. delete all comments that belongs to this deleted tweet
+	// 	1. delete all comments that belong to this deleted tweet
 	try {
 		await mongoose.model('Comment').deleteMany(
 			{
