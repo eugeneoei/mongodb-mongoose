@@ -10,9 +10,9 @@ router.get('', async (req, res) => {
 			await Comment.find(
 				{}
 			)
-			.populate({
-				path: 'user'
-			})
+			// .populate({
+			// 	path: 'user'
+			// })
 		)
 	} catch(e) {
 		res.status(400).send({
@@ -24,7 +24,6 @@ router.get('', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
 	try {
-		// res.send(await Comment.find({}))
 		const comment = await Comment.findById(req.params.id)
 		if (comment) {
 			res.send(comment)
@@ -39,46 +38,29 @@ router.get('/:id', async (req, res) => {
 	}
 })
 
+// NOTE:
+// should be able to use a "post" hook middleware for "save" method in "Comment" to update tweet document's comments field.
+// but somehow, hook is not working. for now, using conventional approach
+// to revisit.
 router.post('', async (req, res) => {
-	// attach user and tweet to comment
-	// attach comment to tweet
-
-
-	console.log('hi')
-	// create comment in db and update tweet's comments with new comment
-
 	try {
-
 		const { userId, tweetId, body } = req.body
-
-		const user = await User.findById(userId)
-		const tweet = await Tweet.findById(tweetId)
-
+		// when a comment is created, we need to
+		// 	1. push comment to tweet's comments array
 		const newComment = await Comment.create({
 			body,
-			user,
-			tweet
+			user: userId,
+			tweet: tweetId
 		})
-		
-		const updatedTweet = await Tweet.findByIdAndUpdate(
+		await Tweet.findByIdAndUpdate(
 			tweetId,
 			{
 				$push : {
-					comments: newComment
+					comments: newComment._id
 				}
-			},
-			{
-				new: true
 			}
 		)
-
 		res.redirect(`/tweets/${tweetId}`)
-
-		// if (updatedTweet) {
-		// 	res.send(updatedTweet)
-		// } else {
-		// 	throw new Error('Something went wrong when creating a new comment')
-		// }
 	} catch(e) {
 		res.status(400).send({
 			name: e.name,
@@ -91,14 +73,16 @@ router.delete('/:id', async (req, res) => {
 	try {
 		// there is a "post" hook middleware declared for "findOneAndDelete" in "Comment" (refer to comment schema)
 		// ie whenever, "Comment" model uses the method "findOneAndDelete", this middleware will be executed
-		// note that middlewares can only be used for some methods
-		const deleteResponse = await Comment.findOneAndDelete({
+		// middlewares are applicable only for some methods
+		// note that "findByIdAndDelete" triggers the middleware for "findOneAndDelete". so if you decide to use "findByIdAndDelete" here, it will still work.
+		const deletedComment = await Comment.findOneAndDelete({
 			_id: req.params.id
 		})
-		if (!deleteResponse) {
-			throw new Error('The comment you are trying to delete does not exist.')
+		if (deletedComment) {
+			res.send('ok')
+		} else {
+			throw new Error('The Comment you are trying to delete does not exist.')
 		}
-		res.send('ok')
 
 	} catch(e) {
 		res.status(400).send({

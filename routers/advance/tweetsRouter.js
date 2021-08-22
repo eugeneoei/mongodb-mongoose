@@ -43,33 +43,56 @@ router.get('', async (req, res) => {
 		// // .select('title').populate('author')
 		// res.send(tweets)
 
-		// Requirement 1
+		// // Requirement 1
 		// show all tweets with populated user information for each tweet
 		const tweets = await Tweet.find(
 			{
-				// comments: '6120e828a864db1bb3fa0419'
+			// 	comments: '6121f46362153826bb31dca9'
 			}
 		)
 		// .populate({
 		// 	path: 'user',
 		// 	select: 'firstName lastName email'
 		// })
-		.populate([
-			{
-				path: 'user',
-				select: ['_id', 'email', 'firstName', 'lastName']
-			},
-			{
-				path: 'comments',
-				select: ['body', '_id'],
-				populate: {
-					path: 'user',
-					select: ['_id', 'email', 'firstName', 'lastName']
-				}
-				// sort flag?
-			}
-		])
+		// .populate([
+		// 	// {
+		// 	// 	path: 'user',
+		// 	// 	select: ['_id', 'email', 'firstName', 'lastName']
+		// 	// },
+		// 	{
+		// 		path: 'comments',
+		// 		select: ['body', '_id'],
+		// 		populate: {
+		// 			path: 'user',
+		// 			select: ['_id', 'email', 'firstName', 'lastName']
+		// 		}
+		// 		// sort flag?
+		// 	}
+		// ])
 		res.send(tweets)
+
+		// const tweets = await Tweet.find(
+		// 	{
+		// 		comments: '6121f46362153826bb31dca9'
+		// 	}
+		// )
+		// .populate([
+		// 	// {
+		// 	// 	path: 'user',
+		// 	// 	select: ['_id', 'email', 'firstName', 'lastName']
+		// 	// },
+		// 	{
+		// 		path: 'comments',
+		// 		select: ['body', '_id'],
+		// 		populate: {
+		// 			path: 'user',
+		// 			select: ['_id', 'email', 'firstName', 'lastName']
+		// 		}
+		// 		// sort flag?
+		// 	}
+		// ])
+		// console.log(tweets.length)
+		// res.send(tweets)
 
 	} catch (e) {
 		res.status(400).send({
@@ -81,7 +104,6 @@ router.get('', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
 	try {
-
 		// const tweet = await Tweet.findById(req.params.id)
 		// if (tweet) {
 		// 	res.send(tweet)
@@ -89,39 +111,38 @@ router.get('/:id', async (req, res) => {
 		// 	res.status(404).send('Tweet not found')
 		// }
 
-		// // Requirement 1 - populate 1 ref field
-		// // populate user ref who created tweet
-		// const tweet = await Tweet.findById(
-		// 	req.params.id
-		// )
-		// .populate({
-		// 	path: 'user',
-		// 	select: ['_id', 'email', 'firstName', 'lastName']
-		// })
-		// res.send(tweet)
-
-		// Requirement 2 - populate multiple ref fields
+		// Requirement 1 - populate 1 ref field
 		// populate user ref who created tweet
-		// populate comment ref and user who create each individual comment
 		const tweet = await Tweet.findById(
 			req.params.id
 		)
-		.populate([
-			{
-				path: 'user',
-				select: ['_id', 'email', 'firstName', 'lastName']
-			},
-			{
-				path: 'comments',
-				select: ['body', '_id'],
-				populate: {
-					path: 'user',
-					select: ['_id', 'email', 'firstName', 'lastName']
-				}
-				// sort flag?
-			}
-		])
+		.populate({
+			path: 'user',
+			select: ['_id', 'email', 'firstName', 'lastName']
+		})
 		res.send(tweet)
+
+		// // Requirement 2 - populate multiple ref fields
+		// // populate user ref who created tweet
+		// // populate comment ref and user who create each individual comment
+		// const tweet = await Tweet.findById(
+		// 	req.params.id
+		// )
+		// .populate([
+		// 	{
+		// 		path: 'user',
+		// 		select: ['_id', 'email', 'firstName', 'lastName']
+		// 	},
+		// 	{
+		// 		path: 'comments',
+		// 		select: ['body', '_id'],
+		// 		populate: {
+		// 			path: 'user',
+		// 			select: ['_id', 'email', 'firstName', 'lastName']
+		// 		}
+		// 	}
+		// ])
+		// res.send(tweet)
 
 
 		// // Requirement 3 - populate multiple ref fields and pagination
@@ -216,6 +237,13 @@ router.get('/:id', async (req, res) => {
 		// ])
 		// res.send(tweet)
 
+		// const tweet = Tweet.findOne(
+		// 	{
+		// 		comments: '6121cc181851fa25add43391'
+		// 	}
+		// )
+		// res.send(tweet)
+
 
 		// // https://mongoosejs.com/docs/api/model.html#model_Model.populate
 		// const page = 2
@@ -287,27 +315,12 @@ router.get('/:id', async (req, res) => {
 
 router.post('', async (req, res) => {
 	try {
-
 		const { title, body, userId } = req.body
-
-		const user = await User.findById(userId)
-
-		// attach user to tweet
 		const tweet = await Tweet.create({
 			title,
 			body,
-			user
+			user: userId
 		})
-
-		// attach tweet to user
-		await User.findByIdAndUpdate(
-			userId,
-			{
-				$push: {
-					tweets: tweet
-				}
-			}
-		)
 		res.redirect(`/tweets/${tweet['_id']}`)
 	} catch (e) {
 		res.status(400).send({
@@ -319,16 +332,14 @@ router.post('', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
 	try {
-		// delete comments attached to tweet
-		// delete tweet attached to user
-
-		// there is a "post" hook middleware declared for "findOneAndDelete" in "Tweet" (refer to tweet schema)
+		// there is a "post" hook middleware declared for "findOneAndDelete" method in "Tweet" (refer to tweet schema)
 		// ie whenever, "Tweet" model uses the method "findOneAndDelete", this middleware will be executed
-		// note that middlewares can only be used for some methods
-		const deleteResponse = await Tweet.findOneAndDelete({
+		// middlewares are applicable only for some methods
+		// note that "findByIdAndDelete" triggers the middleware for "findOneAndDelete". so if you decide to use "findByIdAndDelete" here, it will still work.
+		const deletedTweet = await Tweet.findOneAndDelete({
 			_id: req.params.id
 		})
-		if (deleteResponse) {
+		if (deletedTweet) {
 			res.send('Successfully deleted tweet.')
 		} else {
 			throw new Error('The tweet you are trying to delete does not exist.')

@@ -34,6 +34,38 @@ app.use('/tweets', tweetsRouter)
 app.use('/comments', commentsRouter)
 app.use('/seeds', seedsRouter)
 
+
+const Tweet = require('./models/advance/tweet')
+app.delete('/test/:id', async (req, res) => {
+	try {
+		// console.log('delete')
+
+		// const tweets = await Tweet.find(
+		// 	{
+		// 		comments: req.params.id
+		// 	}
+		// )
+		// res.send(tweets)
+
+
+
+		await Tweet.updateOne(
+			{
+				comments: req.params.id
+			},
+			{
+				$pull: {
+					comments: req.params.id
+				}
+			}
+		)
+		res.send('ok')
+
+	} catch(e) {
+		res.send(e)
+	}
+})
+
 // const users = [
 // 	{
 // 		firstName: 'Tony',

@@ -1,5 +1,7 @@
 const express = require('express')
 const User = require('../../models/advance/user')
+const Tweet = require('../../models/advance/tweet')
+const Comment = require('../../models/advance/comment')
 const router = express.Router()
 
 router.get('', async (req, res) => {
@@ -45,13 +47,14 @@ router.get('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
 	try {
-		// there is a "post" hook middleware declared for "findOneAndDelete" in "User" (refer to user schema)
+		// there is a "post" hook middleware declared for "findOneAndDelete" method in "User" (refer to user schema)
 		// ie whenever, "User" model uses the method "findOneAndDelete", this middleware will be executed
-		// note that middlewares can only be used for some methods
-		const deleteResponse = await User.findOneAndDelete({
+		// middlewares are applicable only for some methods
+		// note that "findByIdAndDelete" triggers the middleware for "findOneAndDelete". so if you decide to use "findByIdAndDelete" here, it will still work.
+		const deletedUser = await User.findOneAndDelete({
 			_id: req.params.id
 		})
-		if (deleteResponse) {
+		if (deletedUser) {
 			res.send('Successfully deleted User.')
 		} else {
 			throw new Error('The User you are trying to delete does not exist.')

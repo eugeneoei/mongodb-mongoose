@@ -29,7 +29,7 @@ const seedTweets = async () => {
 			const randomUser = users[randomUserIndex]
 				return {
 					...tweet,
-					user: randomUser
+					user: randomUser._id
 				}
 		})
 		await Tweet.insertMany(tweetsWithUser)
@@ -65,8 +65,8 @@ const seedComments = async () => {
 				const randomComment = commentsSeed[randomCommentIndex]
 				return await Comment.create({
 					...randomComment,
-					user: randomUser,
-					tweet
+					user: randomUser._id,
+					tweet: tweet._id
 				})
 			})
 
@@ -74,7 +74,7 @@ const seedComments = async () => {
 			await Tweet.findByIdAndUpdate(
 				tweet['_id'],
 				{
-					comments: commentsArray
+					comments: commentsArray.map(com => com._id)
 				}
 			)
 		}
