@@ -16,10 +16,10 @@ This repository has been structured into 2 parts - **basic** and **advance**. Fi
 
 For basic, it's a simple CRUD API to demonstrate the different implementations and approaches to querying `mongodb` through `mongoose`. Mainly, `GET`, `POST`, `PUT`, `PATCH` and `DELETE` routes.
 
-Refer to this [document](/routers/basic/BASIC.md) for a detailed run through of this section.
+Refer to this [document](/routers/basic/BASIC.md) for a detailed run through of this part.
 
 **Advance**
 
 For advance, to understand the process of establishing relationships between colections in `mongodb` and the use of `mongoose`'s `hook` middlewares to update or clean up dependent documents caused by a change in another document (removing a user removes all their blogposts).
 
-Refer to this [document](/routers/advance/ADVANCE.md) for a detailed run through of this section.
+Refer to this [document](/routers/advance/ADVANCE.md) for a detailed run through of this part.

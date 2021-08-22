@@ -926,7 +926,7 @@ According to the documentation,
 
 I would think the same applies for `findByIdAndDelete` vs `findByIdAndRemove`.
 
-Ready for the more advanced stuff? Refer to this [document](../advance/ADVANCE.md)
+Ready for the more advanced stuff? Refer to this [document](../advance/ADVANCE.md).
 
 # Additional Readings
 
