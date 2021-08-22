@@ -86,22 +86,22 @@ const seedComments = async () => {
 	}
 }
 
-router.get('/clear', async (req, res) => {
+router.get('', async (req, res) => {
 	try {
-		await User.collection.drop()
-		await Tweet.collection.drop()
-		await Comment.collection.drop()
+		await seedUsers()
+		await seedTweets()
+		await seedComments()
 		res.send('ok')
 	} catch(e) {
 		throw e
 	}
 })
 
-router.get('/seed', async (req, res) => {
+router.get('/clear', async (req, res) => {
 	try {
-		await seedUsers()
-		await seedTweets()
-		await seedComments()
+		await User.collection.drop()
+		await Tweet.collection.drop()
+		await Comment.collection.drop()
 		res.send('ok')
 	} catch(e) {
 		throw e

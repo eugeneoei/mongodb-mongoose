@@ -1,46 +1,8 @@
 const express = require('express')
 const validateReactions = require('../../middlewares/validateReactions')
 const Tweet = require('../..//models/basic/tweet')
-const utils = require('../../utils/basic/tweetUtils')
-// const tweetsGenerator = require('../seed/tweetsGenerator')
 
 const router = express.Router()
-
-router.get('/clear', async (req, res) => {
-	try {
-		await utils.clearTweetCollection(Tweet)
-		res.send('ok')
-	} catch (e) {
-		res.status(400).send({
-			name: e.name,
-			message: e.message
-		})
-	}
-})
-
-// router.get('/generate', async (req, res) => {
-// 	try {
-// 		await tweetsGenerator.generateRandomTweets()
-// 		res.send('ok')
-// 	} catch (e) {
-// 		res.status(400).send({
-// 			name: e.name,
-// 			message: e.message
-// 		})
-// 	}
-// })
-
-router.get('/clear-and-seed', async (req, res) => {
-	try {
-		await utils.clearAndSeedTweetCollection(Tweet)
-		res.send('ok')
-	} catch (e) {
-		res.status(400).send({
-			name: e.name,
-			message: e.message
-		})
-	}
-})
 
 router.get('', async (req, res) => {
 	try {
