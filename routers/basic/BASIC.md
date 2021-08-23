@@ -786,7 +786,7 @@ try {
 }
 ```
 
-I was trying out to see if the "saving" of the changes can be intercepted where if the likes/dislikes count is < 0, do not "save". But I don't see any implementation like that. If you guys come across an "interception" solution, do let me know yea (could potentially use a `pre` hook to check for this? have not experimented yet)?
+I was trying out to see if the "saving" of the changes can be intercepted where if the likes/dislikes count is < 0, do not "save". But I don't see any implementation like that. If you guys come across an "interception" solution, do let me know yea (could potentially use a `pre` hook to check for this? yet to experiment with this)?
 
 # `DELETE /tweets/:id` route
 

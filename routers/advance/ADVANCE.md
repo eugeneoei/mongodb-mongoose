@@ -2,6 +2,8 @@
 
 In this advance `mongodb-mongoose` tutorial, the focus is on establishing relationships between collections and how to update or clean up dependent documents caused by a change in a related document using `hook` middlewares.
 
+For example, deleting a user should delete all posts created by this user.
+
 # Getting Started
 
 - Start `mongodb` on your machine (if you are using Atlas, you can skip this step but remember to point `mongoURI` in `index.js` to your own cluster)
@@ -140,7 +142,7 @@ With these above relationships established:
 	
 	1. Push this new comment into tweet's comments array
 
-All these will be achieved through the use of `hooks`. Also, we will look at populating reference documents in the routes.
+All these will be achieved through the use of `hooks`. Also, we will look at populating reference documents in the `GET /tweets` and `GET /tweets/:id` routes.
 
 # `GET /tweets` 
 
@@ -331,7 +333,7 @@ Note that in requirement 1, the arguemnt passed into `populate` is an **object**
 
 For this route, whenever a tweet is deleted, we need to **also delete all comments that belong to this deleted tweet**. To do this, we use the `hook` middleware.
 
-Deleting a tweet is pretty straightforward so we will skip that and instead look at how the `hook` middleware is used.
+Deleting a tweet is pretty straightforward (if you are unsure, refer to [this](../basic/BASIC.md#delete-tweetsid-route)) so we will skip that and instead look at how the `hook` middleware is used.
 
 In the `tweet` document schema, before the model is initialised, we declare a `post` hook for the `findOneAndDelete` method.
 
@@ -476,6 +478,20 @@ Well, there are definitely benefits in establishing relationships between collec
 Nonetheless, if there are multiple relationships, the process of removing dependent documents can get out of hand. There will be more cleaning up and updates required in the respective `hook`s for each individual schema.
 
 Maybe that is why relational databases might be more suitable?
+
+# Todos
+
+### `POST /users`
+
+When a user is created, declare a `pre` hook for `save` method to check for existence of email address since email field in `User` document schema is supposed to be unique. `mongoose` throws an error like the following which is not easily consumed by client side.
+
+```js
+{
+    "name": "MongoError",
+    "message": "E11000 duplicate key error collection: mongodb-mongoose.users index: email_1 dup key: { email: \"tony.stark@email.com\" }"
+}
+```
+If email already exists, `throw new Error('Email has already been taken.')`
 
 # Additional Readings
 
