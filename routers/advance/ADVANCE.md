@@ -126,7 +126,7 @@ With these above relationships established:
 
 	1. Delete all tweets created by deleted user
 	2. Delete all comments created by deleted user
-	3. Remove ("clean up") all comments made by deleted user in **ALL** tweets
+	3. Remove ("clean up") all comments created by deleted user in **ALL** tweets
 
 - When a tweet is deleted, we need to:
 	
@@ -226,7 +226,7 @@ try {
 }
 ```
 
-To filter reference documents, pass in `match` and the respective filters you want to apply accordingly. Note that, if the match fails, value returned will be `null`. It **does not** exclude the value. As a result of this, I would to avoid filtering reference documents? :man-shrugging:
+To filter reference documents, pass in `match` and the respective filters you want to apply accordingly. Note that, if the match fails, value returned will be `null`. It **does not** exclude the value. As a result of this, I would personally avoid filtering reference documents? Not 100% confident with this.
 
 ## R3 - Show all tweets with populated user and comments with user details but view only comments by users whose emails are either "steve.rogers@email.com" or "black.panther@email.com"
 ```js
@@ -265,7 +265,7 @@ try {
 }
 ```
 
-Similarly, if the match fails, value returned will be `null`. It **does not** exclude the value.
+Similarly, if the `match` fails, value returned will be `null`. It **does not** exclude the value.
 
 # `GET /tweets/:id` route
 
@@ -325,15 +325,15 @@ try {
 }
 ```
 
-Note that in requirement 1, the arguemnt passed into `populate` is an object. Whereas in requirement 2, the argument passed into `populate` is an array of objects. Therefore, if you are populating multiple references within a document, pass in an array of objects to `populate`.
+Note that in requirement 1, the arguemnt passed into `populate` is an **object**. Whereas in requirement 2, the argument passed into `populate` is an **array of objects**. Therefore, if you are populating multiple references within a document, pass in an array of objects to `populate` with the desired key-value pairs accordingly.
 
 # `DELETE /tweets/:id` route
 
 For this route, whenever a tweet is deleted, we need to **also delete all comments that belong to this deleted tweet**. To do this, we use the `hook` middleware.
 
-Deleting a tweet is pretty straightforward so let's look at how the `hook` middleware is used.
+Deleting a tweet is pretty straightforward so we will skip that and instead look at how the `hook` middleware is used.
 
-In the `tweet` schema, before the model is initialised, we declare a `post` hook for the `findOneAndDelete` method.
+In the `tweet` document schema, before the model is initialised, we declare a `post` hook for the `findOneAndDelete` method.
 
 ```js
 tweetSchema.post('findOneAndDelete', async doc => {
@@ -355,13 +355,13 @@ What happens here is that, whenever the `Tweet` model calls the `findOneAndDelet
 
 Middlewares are applicable only for some methods. Refer to the `mongoose` middleware docs [here](https://mongoosejs.com/docs/middleware.html).
 
-According to the `mongoose` documentation [here](https://mongoosejs.com/docs/api.html#model_Model.findByIdAndDelete), `findByIdAndDelete()` triggers the middleware for `findOneAndDelete`. Therefore, you can use either `findByIdAndDelete` or `findOneAndDelete` to delete the tweet in your route. Both should work.
+According to the `mongoose` documentation [here](https://mongoosejs.com/docs/api.html#model_Model.findByIdAndDelete), `findByIdAndDelete()` triggers the middleware for `findOneAndDelete`. Therefore, you can use either `findByIdAndDelete` or `findOneAndDelete` to delete the tweet in your route. Both should work and trigger this hook for `findOneAndDelete`.
 
 # `POST /comments` route
 
 For this route, whenever a comment is created, we need to push this new comment into the tweet's comments array. To do this, we use the `hook` middleware.
 
-In the `comment` schema, before the model is initialised, we declare a `post` hook for the `save` method.
+In the `comment` document schema, before the model is initialised, we declare a `post` hook for the `save` method.
 
 ```js
 commentSchema.post('save', async doc => {
@@ -382,7 +382,7 @@ commentSchema.post('save', async doc => {
 })
 ```
 
-What happens here is that, whenever the `Comment` model calls the `save` method, this `post` hook will execute **after** `save` is completed. This is where we will add the newly created comment document into the tweet's comments array.
+What happens here is that, whenever the `Comment` model calls the `save` method, this `post` hook will execute **after** `save` is completed. This is where we will add the newly created comment document into the tweet's `comments` field array.
 
 `doc` refers to the created comment document.
 
@@ -392,7 +392,7 @@ According to the `mongoose` documentation [here](https://mongoosejs.com/docs/api
 
 For this route, whenever a comment is deleted, we need to remove ("clean up") this comment from the tweet's comments array. To do this, we will use the `hook` middleware.
 
-In the `comment` schema, before the model is initialised, we declare a `post` hook for the `findOneAndDelete` method.
+In the `comment` document schema, before the model is initialised, we declare a `post` hook for the `findOneAndDelete` method.
 
 ```js
 commentSchema.post('findOneAndDelete', async doc => {
@@ -425,11 +425,11 @@ For this route, whenever a user is deleted, we need to do the following 3 things
 
 1. Delete all tweets created by deleted user
 2. Delete all comments created by deleted user
-3. Remove ("clean up") all comments made by deleted user in **ALL** tweets
+3. Remove ("clean up") all comments created by deleted user in **ALL** tweets
 
 To achieve the above 3, we will use the `hook` middleware.
 
-In the `user` schema, before the model is initialised, we declare a `post` hook for the `findOneAndDelete` method.
+In the `user` document schema, before the model is initialised, we declare a `post` hook for the `findOneAndDelete` method.
 
 ```js
 userSchema.post('findOneAndDelete', async doc => {
@@ -463,7 +463,7 @@ userSchema.post('findOneAndDelete', async doc => {
 })
 ```
 
-What happens here is that, whenever the `User` model calls the `findOneAndDelete` method, this `post` hook will execute **after** `findOneAndDelete` is completed. This is where we will execute the 3 things stated above.
+What happens here is that, whenever the `User` model calls the `findOneAndDelete` method, this `post` hook will execute **after** `findOneAndDelete` is completed. This is where we will execute the 3 abovementioned tasks when a user is deleted.
 
 `doc` refers to the deleted user document.
 
@@ -479,4 +479,4 @@ Maybe that is why relational databases might be more suitable?
 
 # Additional Readings
 
-- [Middleware](https://mongoosejs.com/docs/middleware.html)
+- [Mongoose Middleware](https://mongoosejs.com/docs/middleware.html)
