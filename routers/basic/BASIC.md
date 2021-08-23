@@ -786,7 +786,7 @@ try {
 }
 ```
 
-I was trying out to see if the "saving" of the changes can be intercepted where if the likes/dislikes count is < 0, do not "save". But I don't see any implementation like that. If you guys come across an "interception" solution, do let me know yea?
+I was trying out to see if the "saving" of the changes can be intercepted where if the likes/dislikes count is < 0, do not "save". But I don't see any implementation like that. If you guys come across an "interception" solution, do let me know yea (could potentially use a `pre` hook to check for this? have not experimented yet)?
 
 # `DELETE /tweets/:id` route
 
@@ -833,7 +833,7 @@ Therefore we need to handle manually. But of course, as Zhiquan mentioned during
 **Method 2** using
 [findOneAndDelete](https://mongoosejs.com/docs/api.html#model_Model.findOneAndDelete).
 
-Finds a matching document and remove it. Returns null if no match is found.
+Finds a matching document and remove it. Returns `null` if no match is found.
 
 ```js
 try {
@@ -856,7 +856,7 @@ try {
 **Method 3** using
 [findByIdAndDelete](https://mongoosejs.com/docs/api.html#model_Model.findByIdAndDelete).
 
-`findByIdAndDelete(id)` is a shorthand for `findOneAndDelete({ _id: id })`. Returns null if no match is found.
+`findByIdAndDelete(id)` is a shorthand for `findOneAndDelete({ _id: id })`. Returns `null` if no match is found.
 
 ```js
 try {
@@ -877,7 +877,7 @@ try {
 **Method 4** using
 [findOneAndRemove](https://mongoosejs.com/docs/api.html#model_Model.findOneAndRemove).
 
-Finds a matching document and remove it. Returns null if no match is found.
+Finds a matching document and remove it. Returns `null` if no match is found.
 
 ```js
 try {
@@ -900,7 +900,7 @@ try {
 **Method 5** using
 [findByIdAndRemove](https://mongoosejs.com/docs/api.html#model_Model.findByIdAndRemove).
 
-`findByIdAndRemove(id)` is equivalent to `findOneAndRemove({ _id: id })`. Returns null if no match is found.
+`findByIdAndRemove(id)` is equivalent to `findOneAndRemove({ _id: id })`. Returns `null` if no match is found.
 
 ```js
 try {
