@@ -20,20 +20,20 @@ mongoose.set('useCreateIndex', true)
 app.use(express.json())
 // mongoose.set('returnOriginal', false) // global settings such that all updated documents returned are AFTER the update
 
-// // basic
-// const tweetsRouter = require('./routers/basic/tweetsRouter')
-// const seedsRouter = require('./routers/basic/seedsRouter')
-// app.use('/tweets', tweetsRouter)
-// app.use('/seeds', seedsRouter)
-
-// advanced
-const usersRouter = require('./routers/advance/usersRouter')
-const tweetsRouter = require('./routers/advance/tweetsRouter')
-const commentsRouter = require('./routers/advance/commentsRouter')
-const seedsRouter = require('./routers/advance/seedsRouter')
-app.use('/users', usersRouter)
+// basic
+const tweetsRouter = require('./routers/basic/tweetsRouter')
+const seedsRouter = require('./routers/basic/seedsRouter')
 app.use('/tweets', tweetsRouter)
-app.use('/comments', commentsRouter)
 app.use('/seeds', seedsRouter)
+
+// // advanced
+// const usersRouter = require('./routers/advance/usersRouter')
+// const tweetsRouter = require('./routers/advance/tweetsRouter')
+// const commentsRouter = require('./routers/advance/commentsRouter')
+// const seedsRouter = require('./routers/advance/seedsRouter')
+// app.use('/users', usersRouter)
+// app.use('/tweets', tweetsRouter)
+// app.use('/comments', commentsRouter)
+// app.use('/seeds', seedsRouter)
 
 app.listen(3000)
