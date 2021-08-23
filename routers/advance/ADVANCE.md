@@ -483,7 +483,7 @@ Maybe that is why relational databases might be more suitable?
 
 ### 1. `POST /users`
 
-When a user is created, declare a `pre` hook for `save` method to check for existence of email address since email field in `User` document schema is supposed to be unique. `mongoose` throws an error like the following which is not easily consumed by client side.
+When a user is created, declare a `pre` hook for `save` method to check for existence of email address since email field in `User` document schema is a unique field. `mongoose` throws an error like the following which is not easily consumed by client side.
 
 ```js
 {
