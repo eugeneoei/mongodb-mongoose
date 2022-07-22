@@ -17,15 +17,15 @@ router.get('', async (req, res) => {
 })
 
 router.post('', async (req, res) => {
-	try {
-		const newUser = await User.create(req.body)
-		res.send(newUser)
-	} catch(e) {
-		res.status(400).send({
-			name: e.name,
-			message: e.message
-		})
-	}
+	const newUser = await User.create(req.body)
+	res.send(newUser)
+	// try {
+	// } catch(e) {
+	// 	res.status(400).send({
+	// 		name: e.name,
+	// 		message: e.message
+	// 	})
+	// }
 })
 
 router.get('/:id', async (req, res) => {
